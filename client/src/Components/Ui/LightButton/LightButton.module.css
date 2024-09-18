@@ -1,0 +1,26 @@
+.button{
+    background-color: #fff;
+    color: #ff7b00;
+    line-height: 22px;
+    border: none;
+}  
+.button:hover{
+    background-color: #ff7b00;
+    color: #fff;
+    line-height: 22px;
+    border: #fff 2px solid;
+}  
+
+.button:active{
+    background-color: #ff7b00 !important;
+    color: #fff !important;
+    line-height: 22px !important;
+    border: #fff 2px solid !important;
+
+}
+.button:focus {
+   background-color: #fff;
+    color: #ff7b00;
+    line-height: 22px;
+    border: none;
+}
