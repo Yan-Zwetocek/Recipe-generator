@@ -18,7 +18,9 @@ const Heder = (props) => {
         </Nav>  
         <Nav className="ms-auto">  
           <br/>
+        <LightButton> Добавить рецепт </LightButton>  
         <LightButton> Войти </LightButton>  
+        <LightButton> Выйти  </LightButton>  
         </Nav>  
       </Navbar.Collapse>  
     </Navbar>  

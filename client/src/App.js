@@ -1,11 +1,10 @@
 import Heder from "./Components/Heder/Heder";
-import SearchDishForm from "./Components/SearchDishForm/SearchDishForm";
-
+import MainPages from "./pages/MainPages";
 function App() {
   return (
  <div className="app">
  <Heder/> 
- <SearchDishForm/>
+ <MainPages/>
  </div>
     
   );

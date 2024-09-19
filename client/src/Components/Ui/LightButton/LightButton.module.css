@@ -3,6 +3,7 @@
     color: #ff7b00;
     line-height: 22px;
     border: none;
+    margin-right: 20px;
 }  
 .button:hover{
     background-color: #ff7b00;

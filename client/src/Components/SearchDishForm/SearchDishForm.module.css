@@ -3,9 +3,11 @@
     width: 500px;
     height: 500px;
     border-radius: 20px;
+    
 }
 .container{
     display: flex;
+    margin: 0 auto;
     width: 100%;
     gap: 50px;
     justify-content: center;
