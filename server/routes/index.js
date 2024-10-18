@@ -1,0 +1,20 @@
+const Router = require("express");
+const router = new Router();
+const userRouter = require("./userRouter");
+const recipeRouter = require("./recipeRouter");
+const commentRouter = require("./commentRouter");
+const ingredientRouter = require("./ingredientRouter");
+const recipeStepsRouter = require("./recipeStepsRouter");
+const ratingRouter = require("./ratingRouter");
+const cuisineRouter = require("./cuisineRouter");
+const categoryRouter = require("./categoryRouter");
+
+router.use("/user", userRouter);
+router.use("/recipe", recipeRouter);
+router.use("/comment", commentRouter);
+router.use("/ingredient", ingredientRouter);
+router.use("/recipeSteps", recipeStepsRouter);
+router.use("/ratingRouter", ratingRouter);
+router.use("/cuisineRouter", cuisineRouter);
+router.use("/categoryRouter", categoryRouter);
+module.exports = router;
