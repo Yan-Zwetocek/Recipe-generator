@@ -1,5 +1,6 @@
 const sequelize = require("../db");
-const { DataTypes } = require("sequelize");
+const { DataTypes, STRING } = require("sequelize");
+
 
 const User = sequelize.define("user", {
   id: {
@@ -9,8 +10,10 @@ const User = sequelize.define("user", {
     autoIncrement: true,
   },
   username: { type: DataTypes.STRING, unique: true },
-  profile_picture: { type: DataTypes.STRING },
+  avatar: { type: DataTypes.STRING },
   email: { type: DataTypes.STRING, unique: true },
+  activationLink:{ type: STRING},
+  isActivated:{ type: DataTypes.BOOLEAN, defaultValue: false},
   password: { type: DataTypes.STRING },
   role: { type: DataTypes.STRING, defaultValue: "USER" },
 });

@@ -61,7 +61,7 @@ class recipeController {
       let fileName = uuid.v4() + ".jpg";
 
       await recipe_img.mv(
-        path.resolve(__dirname, "../../", "static", fileName)
+        path.resolve(__dirname, "../../", "static", "dishes", fileName) 
       );
 
       
