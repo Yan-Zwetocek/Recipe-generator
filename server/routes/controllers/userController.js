@@ -1,11 +1,16 @@
 const ApiError = require("../../error/ApiError");
 const userService = require("../../service/user-service");
-const {User} = require('../../models/models')
+const {User} = require('../../models/models');
+const { validationResult } = require("express-validator");
 
 class userController {
   async registration(req, res, next) {
     try {
     const {email, password, username, role}= req.body
+    const errors= validationResult(req)
+    if (!errors.isEmpty()) {
+      return next(ApiError.badRequest('Ошибка при валидации', errors.array())); 
+     }
     const avatar = req.files ? req.files.avatar : null
     const  userData=  await userService.registration(email, password, username, role, avatar ) 
       res.cookie('refreshToken', userData.refreshToken, {maxAge: 30* 24 * 60* 60 *1000, httOnly: true })
@@ -19,6 +24,10 @@ class userController {
 
   async login(req, res, next) {
     try {
+      const {email, password,}= req.body
+      const userData=userService.login(email, password)
+      res.cookie('refreshToken', userData.refreshToken, {maxAge: 30* 24 * 60* 60 *1000, httOnly: true })
+      return res.json(userData)
     } catch (e) {
       next(ApiError.badRequest(e.message));
     }

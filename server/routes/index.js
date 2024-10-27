@@ -8,8 +8,14 @@ const recipeStepsRouter = require("./recipeStepsRouter");
 const ratingRouter = require("./ratingRouter");
 const cuisineRouter = require("./cuisineRouter");
 const categoryRouter = require("./categoryRouter");
+const { body } = require("express-validator");
+router.use(
+  "/user",
+  body("email").isEmail(),
+  body("password").isLength({ min: 8, max: 32 }),
+  userRouter
+);
 
-router.use("/user", userRouter);
 router.use("/recipe", recipeRouter);
 router.use("/comment", commentRouter);
 router.use("/ingredient", ingredientRouter);

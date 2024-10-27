@@ -5,7 +5,7 @@ const mailService = require("./mail-service");
 const tokenService = require("./token-service");
 const UserDto = require("../dtos/userDto");
 const path = require("path");
-
+const ApiError = require("../error/ApiError");
 
 class userService {
   async registration(email, password, username, role, avatar) {
@@ -39,7 +39,6 @@ class userService {
 
     const favourites = await Favourites.create({ userId: user.id });
     const userDto = new UserDto(user);
-    console.log(userDto);
     await mailService.sendActivationLink(
       email,
       `${process.env.API_URL}/user/activate/${activationLink}`
@@ -57,6 +56,21 @@ class userService {
     }
     user.isActivated = true;
     await user.save();
+  }
+
+  async login(email, password) {
+    const user = await User.findOne({ where:{ email }});
+    if (!user) {
+       throw ApiError.badRequest("Пользователь не найден");
+    }
+    const isPassEquals = await bcrypt.compare(password, user.password);
+    if (!isPassEquals) {
+     throw ApiError.badRequest("Не верный пароль ");
+    }
+    const userDto = new UserDto(user);
+    const tokens = tokenService.generationToken({ ...userDto });
+    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    return { ...tokens, user: userDto };
   }
 }
 
