@@ -5,7 +5,7 @@ const mailService = require("./mail-service");
 const tokenService = require("./token-service");
 const UserDto = require("../dtos/userDto");
 const path = require("path");
-const { error } = require("console");
+
 
 class userService {
   async registration(email, password, username, role, avatar) {
@@ -20,9 +20,11 @@ class userService {
 
     let fileName = uuid.v4() + ".jpg";
 
-    await avatar.mv(
-      path.resolve(__dirname, "../", "static", "avatars", fileName)
-    );
+    if (avatar) {
+      await avatar.mv(
+        path.resolve(__dirname, "../", "static", "avatars", fileName)
+      );
+    } else fileName = null;
 
     const activationLink = uuid.v4();
     const hashPassword = await bcrypt.hash(password, 3);
@@ -40,19 +42,21 @@ class userService {
     console.log(userDto);
     await mailService.sendActivationLink(
       email,
-    `${process.env.API_URL}/user/activate/${activationLink}`
+      `${process.env.API_URL}/user/activate/${activationLink}`
     );
     const tokens = tokenService.generationToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return { ...tokens, user: userDto };
   }
   async activate(activationLink) {
-    const user = await User.findOne({ where: {activationLink: activationLink } });
+    const user = await User.findOne({
+      where: { activationLink: activationLink },
+    });
     if (!user) {
       throw new Error(" Не корректная ссылка активации");
     }
-    user.isActivated= true
-    await user.save()
+    user.isActivated = true;
+    await user.save();
   }
 }
 

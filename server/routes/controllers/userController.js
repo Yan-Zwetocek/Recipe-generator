@@ -6,7 +6,7 @@ class userController {
   async registration(req, res, next) {
     try {
     const {email, password, username, role}= req.body
-    const {avatar} = req.files
+    const avatar = req.files ? req.files.avatar : null
     const  userData=  await userService.registration(email, password, username, role, avatar ) 
       res.cookie('refreshToken', userData.refreshToken, {maxAge: 30* 24 * 60* 60 *1000, httOnly: true })
       return res.json(userData)
