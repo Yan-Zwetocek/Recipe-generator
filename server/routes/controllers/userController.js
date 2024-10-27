@@ -13,6 +13,7 @@ class userController {
     } catch (e) {
       console.error("Ошибка при регистрации:", e);
       next(ApiError.badRequest(e.message));
+      
     }
   }
 
@@ -30,6 +31,9 @@ class userController {
   }
   async activate(req, res, next) {
     try {
+      const activationLink= req.params.link
+      await userService.activate(activationLink)
+      return res.redirect(process.env.CLIENT_URl)
     } catch (e) {
       next(ApiError.badRequest(e.message));
     }
