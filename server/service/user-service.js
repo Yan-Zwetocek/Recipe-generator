@@ -59,18 +59,22 @@ class userService {
   }
 
   async login(email, password) {
-    const user = await User.findOne({ where:{ email }});
+    const user = await User.findOne({ where: { email } });
     if (!user) {
-       throw ApiError.badRequest("Пользователь не найден");
+      throw ApiError.badRequest("Пользователь не найден");
     }
     const isPassEquals = await bcrypt.compare(password, user.password);
     if (!isPassEquals) {
-     throw ApiError.badRequest("Не верный пароль ");
+      throw ApiError.badRequest("Не верный пароль ");
     }
     const userDto = new UserDto(user);
     const tokens = tokenService.generationToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return { ...tokens, user: userDto };
+  }
+  async logout(refreshToken) {
+    const token = await tokenService.removeToken(refreshToken);
+    return token;
   }
 }
 
