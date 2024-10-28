@@ -79,12 +79,7 @@ class userController {
       next(ApiError.badRequest(e.message));
     }
   }
-  async getUsers(req, res, next) {
-    try {
-    } catch (e) {
-      next(ApiError.badRequest(e.message));
-    }
-  }
+ 
 
   async authCheck(req, res, next) {
     const { id } = req.query;
