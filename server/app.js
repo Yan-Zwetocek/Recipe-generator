@@ -14,7 +14,8 @@ const bcrypt = require("bcrypt");
 // Recipe-generator-database
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.resolve(__dirname, "static")));
+app.use(express.static(path.resolve(__dirname, "static", "avatars")));
+app.use(express.static(path.resolve(__dirname, "static", "dishes")));
 app.use(filesUpload({}));
 app.use(cookieParser());
 app.use("/api", router);

@@ -79,7 +79,6 @@ class userController {
       next(ApiError.badRequest(e.message));
     }
   }
- 
 
   async authCheck(req, res, next) {
     const { id } = req.query;
@@ -87,6 +86,17 @@ class userController {
       return next(ApiError.badRequest("No ID"));
     }
     res.json(id);
+  }
+  async updateUser(req, res, next) {
+    try {
+      const { username } = req.body;
+      const {avatar}= req.files
+      const { id } = req.params;
+      const userData = await userService.update(id, username, avatar);
+      return res.json(userData);
+    } catch (e) {
+      next(ApiError.badRequest(e.message));
+    }
   }
 }
 

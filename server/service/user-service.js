@@ -91,6 +91,28 @@ class userService {
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return { ...tokens, user: userDto };
   }
+
+  async update(userId, username, avatar) {
+    const user = await User.findOne({ where: { id: userId } });
+    if (!user) {
+      throw ApiError.badRequest("Пользователь не найден");
+    }
+
+    let fileName = user.avatar;
+    if (avatar) {
+      fileName = uuid.v4() + ".jpg";
+      await avatar.mv(
+        path.resolve(__dirname, "../", "static", "avatars", fileName)
+      );
+    }
+
+    await user.update({
+      username,
+      avatar: fileName,
+    });
+
+    return { message: "Данные изменены" };
+  }
 }
 
 module.exports = new userService();
