@@ -78,12 +78,12 @@ class userService {
   }
   async refresh(refreshToken) {
     if (!refreshToken) {
-      throw ApiError.Unauthorized();
+      throw ApiError.unauthorized();
     }
     const userData = await tokenService.validateRefreshToken(refreshToken);
     const tokenFromDB = tokenService.findToken(refreshToken);
     if (!userData || !tokenFromDB) {
-      throw ApiError.Unauthorized();
+      throw ApiError.unauthorized();
     }
     const user = await User.findOne({ where: { id } });
     const userDto = new UserDto(user);
@@ -112,6 +112,10 @@ class userService {
     });
 
     return { message: "Данные изменены" };
+  }
+  async getUserById(id) {
+    const user = await User.findOne({ where: { id } }); // Находим пользователя по ID
+    return user;
   }
 }
 

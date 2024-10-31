@@ -8,22 +8,22 @@ module.exports = function (req, res, next) {
   try {
     const authorizationHeader = req.headers.authorization;
     if (!authorizationHeader) {
-      return next(ApiError.Unauthorized(' Пользователь не авторизован  '));
+      return next(ApiError.unauthorized(' Пользователь не авторизован  '));
     }
 
     const accessToken = authorizationHeader.split(" ")[1];
 
     if (!accessToken) {
-      return next(ApiError.Unauthorized(' Пользователь не авторизован  '));
+      return next(ApiError.unauthorized(' Пользователь не авторизован  '));
     }
 
     const userData = tokenService.validateAccessToken(accessToken);
     if (!userData) {
-      return next(ApiError.Unauthorized(' Пользователь не авторизован  '));
+      return next(ApiError.unauthorized(' Пользователь не авторизован  '));
     }
     req.user = userData;
     next();
   } catch (e) {
-    return next(ApiError.Unauthorized(' Пользователь не авторизован  '));
+    return next(ApiError.unauthorized(e.message));
   }
 };
