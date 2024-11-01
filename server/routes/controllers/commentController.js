@@ -8,7 +8,7 @@ class commentController {
             const comment = await Comment.create({  comment_text: commentText, recipeId, userId });
             return res.json(comment);
           } catch (e) {
-            next(ApiError.badRequest(e.massage));
+            next(ApiError.badRequest(e.message));
           }
     }
 
