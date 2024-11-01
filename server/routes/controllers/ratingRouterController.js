@@ -2,7 +2,7 @@ const { Rating, Recipe } = require("../../models/models");
 const ApiError = require("../../error/ApiError");
 
 class RatingController {
-    async  createRating(req, res, next) {
+    async createRating(req, res, next) {
         try {
           const { user_id, recipe_id, rate } = req.body; // Получите recipe_id из запроса
     
@@ -10,7 +10,7 @@ class RatingController {
           const recipe = await Recipe.findByPk(recipe_id); 
     
           if (!recipe) {
-            return next(ApiError.notFound('Recipe not found'));
+            return next(ApiError.badRequest('Recipe not found'));
           }
     
           // Создайте оценку с использованием ассоциаций
@@ -50,7 +50,7 @@ class RatingController {
      const rating = await Rating.findByPk(id);
   
      if (!rating) {
-      return next(ApiError.notFound("Rating not found"));
+      return next(ApiError.badRequest("Rating not found"));
      }
   
      // Получите recipe_id из найденной оценки
@@ -61,7 +61,7 @@ class RatingController {
   
      // Проверка, была ли удалена оценка
      if (deletedCount === 0) {
-      return next(ApiError.notFound("Rating not found"));
+      return next(ApiError.badRequest("Rating not found"));
      }
   
      // Дополнительная логика, если необходимо

@@ -8,7 +8,7 @@ class categoryRouterController {
       const category = await Category.create({ name });
       return res.json(category);
     } catch (e) {
-      next(ApiError.badRequest(e.massage));
+      next(ApiError.badRequest(e.message));
     }
   }
   async getAll(req, res, next) {
