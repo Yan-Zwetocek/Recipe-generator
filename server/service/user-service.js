@@ -110,7 +110,7 @@ class userService {
       username,
       avatar: fileName,
     });
-
+    
     return { message: "Данные изменены" };
   }
   async getUserById(id) {
