@@ -1,12 +1,12 @@
 import React from 'react';
 import SearchDishForm from '../Components/SearchDishForm/SearchDishForm';
-import DishItem from '../Components/DishItem/DishItem';
+import RecipeItem from '../Components/RecipeItem/RecipeItem';
 
 const MainPages = (props) => {
     return (
   <div> 
     <SearchDishForm/>
-    <DishItem/>
+    <RecipeItem/>
   </div>
     );
 }

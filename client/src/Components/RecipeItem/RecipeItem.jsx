@@ -1,8 +1,8 @@
 import React from 'react'; 
-import classes from './DishItem.module.css';  
+import classes from './RecipeItem.module.css';  
 import ColorButton from '../Ui/ColorButton/ColorButton'; 
 
-const DishItem = (props) => { 
+const RecipeItem = (props) => { 
     return ( 
         <div className={classes.container}>  
             <div className={classes.dish__box}> 
@@ -23,4 +23,4 @@ const DishItem = (props) => {
     ); 
 } 
 
-export default DishItem;
+export default RecipeItem;
