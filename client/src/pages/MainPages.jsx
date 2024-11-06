@@ -1,14 +1,15 @@
-import React from 'react';
-import SearchDishForm from '../Components/SearchDishForm/SearchDishForm';
-import RecipeItem from '../Components/RecipeItem/RecipeItem';
+import React from "react";
+
+import RecipeItem from "../Components/RecipeItem/RecipeItem";
+import SearchRecipeForm from "../Components/SearchRecipeForm/SearchRecipeForm";
 
 const MainPages = (props) => {
-    return (
-  <div> 
-    <SearchDishForm/>
-    <RecipeItem/>
-  </div>
-    );
-}
+  return (
+    <div>
+      <SearchRecipeForm />
+      <RecipeItem />
+    </div>
+  );
+};
 
 export default MainPages;
