@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { authRoutes, publicRoutes } from "../routes";
 import { MAIN_ROUTE } from "../utils/consts";
-const isAuth = false;
+import { Context } from "../index";
 const AppRouter = (props) => {
+  const { user } = useContext(Context);
+
   return (
     <Routes>
-      {isAuth &&
+      {user.isAuth &&
         authRoutes.map((route) => (
           <Route
             key={route.path}
@@ -23,7 +25,7 @@ const AppRouter = (props) => {
           exact
         />
       ))}
-      <Route path="*" element={<Navigate to={MAIN_ROUTE}/>}/>
+      <Route path="*" element={<Navigate to={MAIN_ROUTE} />} />
     </Routes>
   );
 };
