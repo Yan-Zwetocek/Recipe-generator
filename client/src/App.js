@@ -1,12 +1,14 @@
+import { BrowserRouter } from "react-router-dom";
 import Heder from "./Components/Heder/Heder";
-import MainPages from "./pages/MainPages";
+import AppRouter from "./Components/AppRouter";
 function App() {
   return (
- <div className="app">
- <Heder/> 
- <MainPages/>
- </div>
-    
+    <BrowserRouter>
+      <div className="app">
+        <Heder/>
+        <AppRouter />
+      </div>
+    </BrowserRouter>
   );
 }
 
