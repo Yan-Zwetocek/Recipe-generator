@@ -1,11 +1,11 @@
 import { BrowserRouter } from "react-router-dom";
-import Heder from "./Components/Heder/Heder";
+import Header from "./Components/Header/Header";
 import AppRouter from "./Components/AppRouter";
 function App() {
   return (
     <BrowserRouter>
       <div className="app">
-        <Heder/>
+        <Header/>
         <AppRouter />
       </div>
     </BrowserRouter>
