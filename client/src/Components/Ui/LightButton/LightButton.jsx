@@ -2,7 +2,7 @@ import { Button } from 'react-bootstrap';
 import React from 'react';
 import classes from './LightButton.module.css'
 
-    const LightButton = ({props, children}) => {
+    const LightButton = ({ children, ...props}) => {
     return (
   <Button {...props} className={classes.button}> {children} </Button>
     );
