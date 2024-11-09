@@ -13,7 +13,6 @@ import { REGISTRATION_ROUTE } from "../../utils/consts";
 const Header = observer(() => {
   const [ modelActive, setModalActive ] = useState(false);
   const { user } = useContext(Context);
-  console.log(user._isAuth);
   return (
     <Navbar collapseOnSelect expand="lg" className={classes.heder}>
       <Navbar.Brand>
@@ -41,7 +40,7 @@ const Header = observer(() => {
         </Nav>
       </Navbar.Collapse>
       <Modal active={modelActive} setActive={setModalActive}>
-       <LoginForm> Войти</LoginForm>
+       <LoginForm onClick> Войти</LoginForm>
        <div> Нет аккаунта? <NavLink to={REGISTRATION_ROUTE}onClick={()=>setModalActive(false)} > Зарегистрируйтесь </NavLink> </div>
       </Modal>
     </Navbar>

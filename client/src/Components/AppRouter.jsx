@@ -5,10 +5,10 @@ import { MAIN_ROUTE } from "../utils/consts";
 import { Context } from "../index";
 const AppRouter = (props) => {
   const { user } = useContext(Context);
-
+console.log(user._isAuth)
   return (
     <Routes>
-      {user.isAuth &&
+      {user._isAuth &&
         authRoutes.map((route) => (
           <Route
             key={route.path}

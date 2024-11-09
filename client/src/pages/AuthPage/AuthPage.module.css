@@ -1,0 +1,49 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 50%;
+  border-radius: 20px;
+  margin: 20px;
+  padding: 20px;
+  background-color: #ff7b00;
+}
+
+.ava__input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.ava__button {
+  width: 20%;
+  position: relative;
+  
+}
+@media (max-width: 768px) { 
+    .form{
+        width: 100%;
+    }
+    .ava__button {
+     width: 100%; /* Занимает всю ширину контейнера на мобильных устройствах */
+    }
+    .container{
+        display: flex;
+        justify-content: center;
+    }
+   }
+
+.ava__prev {
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  border-radius: 50%;
+  margin-top: 10px;
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}

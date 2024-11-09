@@ -4,7 +4,7 @@ import classes from './ColorButton.module.css'
 
 const ColorButton = ({ children, ...props}) => {
     return (
-    <Button {...props} className={classes.button}> {children} </Button>
+    <Button {...props} className={`${classes.button} ${props.className}`}> {children} </Button>
     );
 }
 
