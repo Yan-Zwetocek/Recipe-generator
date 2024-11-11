@@ -1,0 +1,46 @@
+.form {
+  display: flex;
+  margin: 5px;
+  flex-direction: column;
+  gap: 10px;
+}
+.foto__button {
+  width: 20%;
+  margin: 5px;
+  padding: 10px;
+  position: relative;
+}
+.foto__input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.short__input {
+  width: 10%;
+}
+.ingredient__form {
+  background-color: #ff7b00;
+  color: #fff;
+  border-radius: 20px;
+  padding: 20px;
+}
+.step__form{
+    background-color: #ff7b00;
+    color: #fff;
+    border-radius: 20px;
+    padding: 20px;
+}
+@media (max-width: 850px) {
+  .short__input {
+    width: 50%;
+  }
+  .foto__button {
+    width: 50%;
+    height: 20%;
+
+    position: relative;
+  }
+}
