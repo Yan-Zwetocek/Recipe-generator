@@ -1,6 +1,6 @@
 import AdminPage from "./pages/AdminPage";
 import AuthPage from "./pages/AuthPage/AuthPage";
-import CreateRecipePage from "./pages/CreateRecipePage";
+import CreateRecipePage from "./pages/CreateRecipePage/CreateRecipePage";
 import RecipePage from "./pages/RecipePage";
 import FavoritesPage from "./pages/FavoritesPage";
 import MainPages from "./pages/MainPages";
