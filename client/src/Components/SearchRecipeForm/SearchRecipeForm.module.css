@@ -1,4 +1,5 @@
 .form{
+    display: flex;
     background-color:  #ff7b00;
     width: 500px;
     height: 500px;
@@ -13,4 +14,10 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+@media (max-width: 750px) {
+    .form{
+        width: 91%;
+    }
+    
 }
