@@ -7,12 +7,14 @@ import { Context } from "../..";
 import { observer } from "mobx-react-lite";
 import Modal from "../Ui/Modal/Modal";
 import LoginForm from "../LoginForm/LoginForm";
-import { NavLink } from "react-router-dom";
-import { REGISTRATION_ROUTE } from "../../utils/consts";
+import { NavLink, useNavigate } from "react-router-dom";
+import { REGISTRATION_ROUTE, CREATE_ROUTE } from "../../utils/consts";
 
 const Header = observer(() => {
   const [ modelActive, setModalActive ] = useState(false);
   const { user } = useContext(Context);
+  const navigate = useNavigate(); // Добавили useNavigate
+
   return (
     <Navbar collapseOnSelect expand="lg" className={classes.heder}>
       <Navbar.Brand>
@@ -30,7 +32,9 @@ const Header = observer(() => {
         </Nav>
         <Nav className="ms-auto">
           <br />
-          <LightButton> Добавить рецепт </LightButton>
+          <LightButton className={classes.button} onClick={() => navigate(CREATE_ROUTE)}> 
+            Добавить рецепт 
+          </LightButton>
 
           {user._isAuth ? (
             <LightButton> Выйти </LightButton>
@@ -40,7 +44,7 @@ const Header = observer(() => {
         </Nav>
       </Navbar.Collapse>
       <Modal active={modelActive} setActive={setModalActive}>
-       <LoginForm onClick> Войти</LoginForm>
+       <LoginForm onClick className={classes.button}> Войти</LoginForm>
        <div> Нет аккаунта? <NavLink to={REGISTRATION_ROUTE}onClick={()=>setModalActive(false)} > Зарегистрируйтесь </NavLink> </div>
       </Modal>
     </Navbar>
@@ -48,3 +52,4 @@ const Header = observer(() => {
 });
 
 export default Header;
+

@@ -6,7 +6,11 @@
     background-color: #ff7b00;
     width: 100vw;
 }
-
+@media (max-width: 991px) {
+  .button{
+    margin-bottom: 35px;
+  }
+}
 
 
 

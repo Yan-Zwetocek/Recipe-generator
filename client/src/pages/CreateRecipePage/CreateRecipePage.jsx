@@ -140,6 +140,5 @@ const CreateRecipePage = (props) => {
       </form>
     </div>
   );
-};
-
+}
 export default CreateRecipePage;

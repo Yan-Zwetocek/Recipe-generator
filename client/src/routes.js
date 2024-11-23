@@ -1,4 +1,4 @@
-import AdminPage from "./pages/AdminPage";
+import AdminPage from "./pages/AdminPage/AdminPage";
 import AuthPage from "./pages/AuthPage/AuthPage";
 import CreateRecipePage from "./pages/CreateRecipePage/CreateRecipePage";
 import RecipePage from "./pages/RecipePage";
