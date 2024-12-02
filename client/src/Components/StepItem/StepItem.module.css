@@ -1,0 +1,24 @@
+.container {
+    display: flex; /* Или grid, если вам удобнее */
+    align-items: center; /* Выравнивание по вертикали */
+    gap: 10px;
+    padding: 5px;
+    border-radius: 10px;
+    border: 5px solid #ff7b00;
+   }
+   
+   .step__text {
+    flex: 1; /* Занимает доступное пространство */
+   }
+   
+   .step__img {
+    width: 200px; /* Установите желаемую ширину изображения */
+    height: auto; /* Автоматически подстраивает высоту под ширину */
+   }
+   
+   .step__img img {
+    width: 100%; /* Занимает всю ширину контейнера */
+    height: auto; /* Автоматически подстраивает высоту */
+    display: block; /* Убирает лишний пробел внизу */
+    border-radius: 10px;
+   }

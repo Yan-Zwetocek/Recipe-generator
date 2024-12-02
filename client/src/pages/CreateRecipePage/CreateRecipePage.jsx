@@ -4,7 +4,7 @@ import ColorButton from "../../Components/Ui/ColorButton/ColorButton";
 import LightButton from "../../Components/Ui/LightButton/LightButton";
 import SelectList from "../../Components/Ui/SelectList/SelectList";
 import IngredientItem from "../../Components/Ui/IngredientItem/IngredientItem";
-import StepItem from "../../Components/Ui/StepItem/StepItem";
+import CreateStepItem from "../../Components/Ui/CreateStepItem/createStepItem";
 
 const CreateRecipePage = (props) => {
   const [fileName, setFileName] = useState(null);
@@ -114,7 +114,7 @@ const CreateRecipePage = (props) => {
         </label>
         <div id="stepForm" className={classes.step__form}>
           {steps.map((step, index) => (
-            <StepItem key={index} onDelete={() => handleDeleteSteps(index)} />
+            <CreateStepItem key={index} onDelete={() => handleDeleteSteps(index)} />
           ))}
           <LightButton onClick={() => addSteps()}> Добавить шаг</LightButton>
         </div>

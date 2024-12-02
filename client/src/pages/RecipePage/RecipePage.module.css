@@ -1,0 +1,75 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .user__info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    background-color: #ff7b00;
+    color: #fff;
+  }
+  
+  .user__avatar img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+  
+  .recipe__info {
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .recipe__img img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  
+  .recipe__ingredients ul {
+    font-size: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    list-style: none;
+    padding: 0;
+  }
+  
+  .recipe__steps {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+    margin-top: 20px;
+  }
+  
+  /* Адаптивность */
+  @media (max-width: 768px) {
+    .user__info {
+      flex-direction: column;
+    }
+  
+    .user__avatar img {
+      margin-bottom: 10px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .recipe__info h1 {
+      font-size: 1.5rem;
+    }
+  
+    .recipe__img img {
+      border-radius: 5px;
+    }
+  }
+  

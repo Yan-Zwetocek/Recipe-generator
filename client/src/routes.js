@@ -1,7 +1,7 @@
 import AdminPage from "./pages/AdminPage/AdminPage";
 import AuthPage from "./pages/AuthPage/AuthPage";
 import CreateRecipePage from "./pages/CreateRecipePage/CreateRecipePage";
-import RecipePage from "./pages/RecipePage";
+import RecipePage from "./pages/RecipePage/RecipePage";
 import FavoritesPage from "./pages/FavoritesPage";
 import MainPages from "./pages/MainPages";
 import { ADMIN_ROUTE, CREATE_ROUTE, FAVORITES_ROUTE, LOGIN_ROUTE, MAIN_ROUTE, RECIPE_ROUTE, REGISTRATION_ROUTE } from "./utils/consts";
