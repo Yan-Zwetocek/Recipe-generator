@@ -25,3 +25,9 @@
     line-height: 22px;
     border: none;
 }
+.button:disabled{
+    background-color: #85858571;
+    color: #ff7b00;
+    line-height: 22px;
+    border: none;
+}
