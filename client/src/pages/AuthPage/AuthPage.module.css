@@ -22,6 +22,10 @@
   position: relative;
   
 }
+input:user-invalid{
+  border: 1px solid red;
+
+}
 @media (max-width: 768px) { 
     .form{
         width: 100%;

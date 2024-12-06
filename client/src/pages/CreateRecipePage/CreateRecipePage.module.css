@@ -33,6 +33,17 @@
     border-radius: 20px;
     padding: 20px;
 }
+.error {
+  border: 1px solid red;
+}
+.errorText {
+  color: red;
+  font-size: 12px;
+}
+.submitButton{
+ padding: 10px; 
+ margin: 5px;
+}
 @media (max-width: 850px) {
   .short__input {
     width: 50%;

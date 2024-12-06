@@ -13,17 +13,7 @@ const AuthPage = (props) => {
   return (
     <div className={classes.container}>
       <form className={classes.form}>
-        <LoginForm>Зарегистрироваться</LoginForm>
-        <label htmlFor="recipe_name" className="form-label">
-        Имя пользователя 
-        </label>
-        <input
-          type="text"
-          className="form-control"
-          placeholder=" Ведите имя или ник"
-          id="name"
-          required
-        />
+        <LoginForm isReg={true}>Зарегистрироваться</LoginForm>
 
         <LightButton className={classes.ava__button}>
           Выберите фото
@@ -37,11 +27,7 @@ const AuthPage = (props) => {
 
         <div className={classes.ava__prev}>
           {selectedFile && (
-            <img
-              src={URL.createObjectURL(selectedFile)}
-              alt="Preview"
-              
-            />
+            <img src={URL.createObjectURL(selectedFile)} alt="Preview" />
           )}
         </div>
       </form>
@@ -50,4 +36,3 @@ const AuthPage = (props) => {
 };
 
 export default AuthPage;
-

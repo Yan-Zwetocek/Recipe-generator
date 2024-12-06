@@ -10,7 +10,7 @@
   gap: 10px;
   justify-content: start;
 }
-.step__text {
+textarea {
   height: 200px;
   width: 400px;
   resize: none;

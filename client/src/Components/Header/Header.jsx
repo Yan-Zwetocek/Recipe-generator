@@ -44,7 +44,7 @@ const Header = observer(() => {
         </Nav>
       </Navbar.Collapse>
       <Modal active={modelActive} setActive={setModalActive}>
-       <LoginForm onClick className={classes.button}> Войти</LoginForm>
+       <LoginForm  isReg={false} onClick className={classes.button}> Войти</LoginForm>
        <div> Нет аккаунта? <NavLink to={REGISTRATION_ROUTE}onClick={()=>setModalActive(false)} > Зарегистрируйтесь </NavLink> </div>
       </Modal>
     </Navbar>
