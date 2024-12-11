@@ -2,6 +2,7 @@ import React from "react";
 import classes from "./LoginForm.module.css";
 import LightButton from "../Ui/LightButton/LightButton";
 import { useInput } from "../../Hooks/useInput";
+import PasswordInput from "../Ui/PasswordInput/PasswordInput";
 
 const LoginForm = ({ isReg, children }) => {
   const password = useInput("", { minLengthError: 8, isEmpty: true });
@@ -18,7 +19,9 @@ const LoginForm = ({ isReg, children }) => {
         )}
         <input
           type="text"
-          className={`form-control ${email.isDirty && !email.isEmailError ? classes.error : ""}`}
+          className={`form-control ${
+            email.isDirty && !email.isEmailError ? classes.error : ""
+          }`}
           placeholder="Введите email"
           id="email"
           onBlur={(e) => email.onBlur(e)}
@@ -28,18 +31,7 @@ const LoginForm = ({ isReg, children }) => {
         <label htmlFor="password" className="form-label">
           Пароль
         </label>
-        {password.isDirty && password.minLengthError && (
-          <div className={classes.errorText}> {password.errorText}</div>
-        )}
-        <input
-          type="text"
-          className={`form-control ${password.isDirty && !password.minLengthError ? classes.error : ""}`}
-          placeholder="Введите пароль"
-          id="password"
-          onBlur={(e) => password.onBlur(e)}
-          onChange={(e) => password.onChange(e)}
-          required
-        />
+        <PasswordInput password={password} />
         {isReg && ( // Условный рендеринг поля имени пользователя
           <>
             <div className="form-group">
@@ -51,7 +43,11 @@ const LoginForm = ({ isReg, children }) => {
               )}
               <input
                 type="text"
-                className= {`form-control ${username.isDirty && !username.minLengthError ? classes.error : ""}`}
+                className={`form-control ${
+                  username.isDirty && !username.minLengthError
+                    ? classes.error
+                    : ""
+                }`}
                 placeholder="Введите имя или ник"
                 id="username"
                 onBlur={(e) => username.onBlur(e)}
@@ -64,7 +60,11 @@ const LoginForm = ({ isReg, children }) => {
       </div>
       <div className="col-md-6">
         <LightButton
-          disabled={!email.isValid || !password.isValid || !username.isValid}
+          disabled={
+            !email.isValid ||
+            !password.isValid ||
+            (isReg ? !username.isValid : false)
+          }
           className={classes.button}
         >
           {children}
