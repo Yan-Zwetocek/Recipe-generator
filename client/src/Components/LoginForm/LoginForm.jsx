@@ -1,13 +1,39 @@
-import React from "react";
+import React, { useContext } from "react";
 import classes from "./LoginForm.module.css";
 import LightButton from "../Ui/LightButton/LightButton";
 import { useInput } from "../../Hooks/useInput";
 import PasswordInput from "../Ui/PasswordInput/PasswordInput";
-
+import { login, registration } from "../../http/userAPI";
+import { unstable_HistoryRouter, useNavigate } from "react-router-dom";
+import { MAIN_ROUTE } from "../../utils/consts";
+import { Context } from "../..";
 const LoginForm = ({ isReg, children }) => {
   const password = useInput("", { minLengthError: 8, isEmpty: true });
   const email = useInput("", { isEmpty: true, isEmail: true });
   const username = useInput("", { minLengthError: 2, isEmpty: true });
+  const {user} = useContext(Context)
+  const navigate = useNavigate(); 
+  const checkRegistration = async (email, password, username) => {
+    try {
+      if (isReg) {
+        if(email.isValid && password.isValid && username.isValid){
+
+           const data = await registration(email.value, password.value, username.value);
+        }
+      } else {
+          const data= await login(email.value, password.value);
+      }
+      user.setUser(user);
+      navigate(MAIN_ROUTE)
+      console.log(user._isAuth)
+      
+      user.setIsAuth(true)
+      
+    } catch (e) {
+      alert(e.message);
+      
+    }
+  };
   return (
     <form className={`${classes.form}`}>
       <div className="col-md-6">
@@ -66,6 +92,7 @@ const LoginForm = ({ isReg, children }) => {
             (isReg ? !username.isValid : false)
           }
           className={classes.button}
+          onClick={() => checkRegistration(email, password, username)}
         >
           {children}
         </LightButton>
