@@ -68,17 +68,18 @@ class userController {
   async refresh(req, res, next) {
     try {
       const { refreshToken } = req.cookies;
-      const { email, password } = req.body;
-      const userData = await userService.refresh(refreshToken);
+    const  userData = await userService.refresh(refreshToken);
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httOnly: true,
       });
       return res.json(userData);
     } catch (e) {
-      next(ApiError.badRequest(e.message));
+      console.error("Ошибка при обновлении:", e.message)
+      next(ApiError.badRequest(e));
     }
   }
+  
 
   async authCheck(req, res, next) {
     const { id } = req.query;

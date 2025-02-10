@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Nav, Navbar } from "react-bootstrap";
 import classes from "./Heder.module.css";
 import LightButton from "../Ui/LightButton/LightButton";
@@ -8,13 +8,23 @@ import { observer } from "mobx-react-lite";
 import Modal from "../Ui/Modal/Modal";
 import LoginForm from "../LoginForm/LoginForm";
 import { NavLink, useNavigate } from "react-router-dom";
-import { REGISTRATION_ROUTE, CREATE_ROUTE } from "../../utils/consts";
+import {
+  REGISTRATION_ROUTE,
+  CREATE_ROUTE,
+  MAIN_ROUTE,
+} from "../../utils/consts";
 
 const Header = observer(() => {
-  const [ modelActive, setModalActive ] = useState(false);
+  const [modelActive, setModalActive] = useState(false);
   const { user } = useContext(Context);
   const navigate = useNavigate(); // Добавили useNavigate
+  useEffect(() => {
+    if (user._isAuth) {
+      setModalActive(false);
+    }
+  }, [user._isAuth]);
 
+ 
   return (
     <Navbar collapseOnSelect expand="lg" className={classes.heder}>
       <Navbar.Brand>
@@ -32,24 +42,42 @@ const Header = observer(() => {
         </Nav>
         <Nav className="ms-auto">
           <br />
-          <LightButton className={classes.button} onClick={() => navigate(CREATE_ROUTE)}> 
-            Добавить рецепт 
+          <LightButton
+            className={classes.button}
+            onClick={() => navigate(CREATE_ROUTE)}
+          >
+            Добавить рецепт
           </LightButton>
 
           {user._isAuth ? (
-            <LightButton> Выйти </LightButton>
+            <LightButton onClick={() => user.logout()}> Выйти </LightButton>
           ) : (
-            <LightButton onClick={()=>setModalActive(true)}> Войти </LightButton>
+            <LightButton onClick={() => setModalActive(true)}>
+              {" "}
+              Войти{" "}
+            </LightButton>
           )}
         </Nav>
       </Navbar.Collapse>
       <Modal active={modelActive} setActive={setModalActive}>
-       <LoginForm  isReg={false} onClick className={classes.button}> Войти</LoginForm>
-       <div> Нет аккаунта? <NavLink to={REGISTRATION_ROUTE}onClick={()=>setModalActive(false)} > Зарегистрируйтесь </NavLink> </div>
+        <LoginForm isReg={false}  className={classes.button}>
+          {" "}
+          Войти
+        </LoginForm>
+        <div>
+          {" "}
+          Нет аккаунта?{" "}
+          <NavLink
+            to={REGISTRATION_ROUTE}
+            onClick={() => setModalActive(false)}
+          >
+            {" "}
+            Зарегистрируйтесь{" "}
+          </NavLink>{" "}
+        </div>
       </Modal>
     </Navbar>
   );
 });
 
 export default Header;
-

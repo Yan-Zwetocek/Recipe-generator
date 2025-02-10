@@ -1,7 +1,6 @@
 const sequelize = require("../db");
 const { DataTypes, STRING } = require("sequelize");
 
-
 const User = sequelize.define("user", {
   id: {
     type: DataTypes.INTEGER,
@@ -12,11 +11,12 @@ const User = sequelize.define("user", {
   username: { type: DataTypes.STRING, unique: true },
   avatar: { type: DataTypes.STRING },
   email: { type: DataTypes.STRING, unique: true },
-  activationLink:{ type: STRING},
-  isActivated:{ type: DataTypes.BOOLEAN, defaultValue: false},
+  activationLink: { type: DataTypes.STRING },
+  isActivated: { type: DataTypes.BOOLEAN, defaultValue: false },
   password: { type: DataTypes.STRING },
   role: { type: DataTypes.STRING, defaultValue: "USER" },
 });
+
 
 const Favourites = sequelize.define("favourites", {});
 
@@ -79,7 +79,11 @@ const Ingredients = sequelize.define("ingredients", {
   name: { type: DataTypes.STRING, unique: true, allowNull: false },
   dimension_units: { type: DataTypes.STRING, allowNull: false }, // Единицы измерения
   calorie_content: { type: DataTypes.DECIMAL },
+  protein_content: { type: DataTypes.DECIMAL }, // Содержание белка
+  fat_content: { type: DataTypes.DECIMAL },     // Содержание жира
+  carbohydrate_content: { type: DataTypes.DECIMAL }, // Содержание углеводов
 });
+
 
 const Rating = sequelize.define("rating", {
   id: {

@@ -83,11 +83,11 @@ class userService {
     const userData = await tokenService.validateRefreshToken(refreshToken);
     const tokenFromDB = tokenService.findToken(refreshToken);
     if (!userData || !tokenFromDB) {
-      throw ApiError.unauthorized();
+      throw ApiError.unauthorized('Токен не действителен ');
     }
-    const user = await User.findOne({ where: { id } });
+    const user = await User.findOne({ where: { id: userData.id } });;
     const userDto = new UserDto(user);
-    const tokens = tokenService.generationToken({ ...userDto });
+    const tokens = await tokenService.generationToken({ ...userDto });
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return { ...tokens, user: userDto };
   }

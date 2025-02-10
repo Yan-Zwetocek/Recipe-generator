@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { authRoutes, publicRoutes } from "../routes";
 import { MAIN_ROUTE } from "../utils/consts";
 import { Context } from "../index";
+import { observer } from "mobx-react-lite";
 const AppRouter = (props) => {
   const { user } = useContext(Context);
 console.log(user._isAuth)
@@ -30,4 +31,4 @@ console.log(user._isAuth)
   );
 };
 
-export default AppRouter;
+export default observer(AppRouter) ;

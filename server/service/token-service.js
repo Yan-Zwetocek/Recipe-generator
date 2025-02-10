@@ -32,14 +32,16 @@ class tokenService {
       const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
       return userData;
     } catch (e) {
+      console.error('ошибка верификации ',token)
       return null;
     }
   }
   validateRefreshToken(token) {
     try {
-      const userData = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+      const userData = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
       return userData;
     } catch (e) {
+      console.error('ошибка верификации ',e)
       return null;
     }
   }
@@ -50,11 +52,14 @@ class tokenService {
     return tokenData;
   }
   async findToken(refreshToken) {
-    const tokenData = await tokenModel.RefreshToken.findOne({
-      where: { refreshToken },
-    });
+    console.log('Ищем токен в базе данных:', refreshToken);
+    const tokenData = await tokenModel.RefreshToken.findOne({});
+    if (!tokenData) {
+      console.log('Токен не найден.');
+    }
     return tokenData;
   }
+  
 }
 
 module.exports = new tokenService();

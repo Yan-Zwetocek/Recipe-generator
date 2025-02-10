@@ -78,7 +78,7 @@ const CreateRecipePage = (props) => {
     setStepValidation(updatedValidation);
   };
   
- console.log(recipeDescription.minLengthError)
+
   return (
     <div className={classes.container}>
       <label htmlFor="form" className="h3 fw-bold">
