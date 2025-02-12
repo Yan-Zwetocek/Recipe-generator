@@ -1,4 +1,4 @@
-import {$authHost} from '../http'
+import {$authHost, $host} from '../http'
 
  export default class authService{
       static async login(email, password ){
@@ -10,5 +10,9 @@ import {$authHost} from '../http'
       static async logout (){
         return $authHost.post('api/user/logout' )
       } 
+      static async getUserById(id) {
+        return $authHost.get(`api/user/${id}`);
+    }
+    
         
  }

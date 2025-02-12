@@ -79,15 +79,26 @@ class userController {
       next(ApiError.badRequest(e));
     }
   }
-  
-
-  async authCheck(req, res, next) {
-    const { id } = req.query;
-    if (!id) {
-      return next(ApiError.badRequest("No ID"));
+   async getUserById(req, res, next){
+     
+     const {id} = req.params 
+    try {
+      const user = await User.findByPk(id, {
+        attributes: ['username', 'role', 'avatar' ],  // Укажите здесь нужные колонки
+     });
+     
+    
+      if (!user) {
+       return res.status(404).json({ error: "User not found" });
+      }
+    
+      return res.json(user);
+     } catch (e) {
+      console.error("Error in getUserById:", e);
+      next(ApiError.badRequest(e.message));
+     }
     }
-    res.json(id);
-  }
+   
   async updateUser(req, res, next) {
     try {
       const { username } = req.body;
