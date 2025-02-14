@@ -5,30 +5,29 @@ import AppRouter from "./Components/AppRouter";
 import { observer } from "mobx-react-lite";
 import { Context } from ".";
 import { Spinner } from "react-bootstrap";
+import AdminPage from "./pages/AdminPage/AdminPage";
 
-const App = () => {
-  const { user } = useContext(Context); // Вызываем useContext ВНУТРИ компонента
-  const [loading, setLoading] = useState(false);
-  useEffect(() => { 
+const App = observer(() => {
+  const { user } = useContext(Context);
+  const [loading, setLoading] = useState(true); // Начинаем с true
+
+  useEffect(() => {
     if (localStorage.getItem('token')) {
-      user.checkAuth().then((value) => {
-        setLoading(true)
-      }).finally(() => {
-        setLoading(false); // Stop loading
-      });
+      user.checkAuth().finally(() => setLoading(false));
+    } else {
+      setLoading(false); // Если токена нет, сразу выключаем загрузку
     }
   }, []);
- if(loading){
-  return <Spinner/>
- }
+
+  if (loading) {
+    return <Spinner animation="border" />;
+  }
+
   return (
     <BrowserRouter>
-      <div className="app">
-        <Header />
-        <AppRouter />
-      </div>
+      <Header />
+      <AppRouter />
     </BrowserRouter>
   );
-};
-
-export default observer(App); // Оборачиваем React-компонент в observer
+});
+ export default App

@@ -12,19 +12,26 @@ import {
   REGISTRATION_ROUTE,
   CREATE_ROUTE,
   MAIN_ROUTE,
+  ADMIN_ROUTE,
 } from "../../utils/consts";
 
 const Header = observer(() => {
+  const [roleChecked, setRoleChecked] = useState(false);
   const [modelActive, setModalActive] = useState(false);
   const { user } = useContext(Context);
   const navigate = useNavigate(); // Добавили useNavigate
-  useEffect(() => {
-    if (user._isAuth) {
-      setModalActive(false);
+useEffect(() => {
+  if (user._isAuth) {
+    setModalActive(false);
+    if (user.user.data?.role === "ADMIN") {
+      setRoleChecked(true);
+    } else {
+      setRoleChecked(false);
     }
-  }, [user._isAuth]);
 
- 
+    
+  }
+}, [user._isAuth]);
   return (
     <Navbar collapseOnSelect expand="lg" className={classes.heder}>
       <Navbar.Brand>
@@ -48,6 +55,14 @@ const Header = observer(() => {
           >
             Добавить рецепт
           </LightButton>
+          {roleChecked ? (
+            <LightButton
+              className={classes.button}
+              onClick={() => navigate(ADMIN_ROUTE)}
+            >
+              Админ панель
+            </LightButton>
+          ) : null}
 
           {user._isAuth ? (
             <LightButton onClick={() => user.logout()}> Выйти </LightButton>
@@ -60,7 +75,7 @@ const Header = observer(() => {
         </Nav>
       </Navbar.Collapse>
       <Modal active={modelActive} setActive={setModalActive}>
-        <LoginForm isReg={false}  className={classes.button}>
+        <LoginForm isReg={false} className={classes.button}>
           {" "}
           Войти
         </LoginForm>
