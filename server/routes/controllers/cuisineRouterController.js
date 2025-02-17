@@ -5,12 +5,26 @@ class cuisineRouterController {
   async create(req, res, next) {
     try {
       const { name } = req.body;
+  
+      // Проверка: name должно существовать и быть строкой
+      if (!name || typeof name !== 'string' || name.trim() === '') {
+        return next(ApiError.badRequest('Название кухни (name) обязательно и должно быть строкой.'));
+      }
+  
+      // Проверка на дубликаты (если в базе не должно быть одинаковых названий)
+      const existingCuisine = await Cuisine.findOne({ where: { name } });
+      if (existingCuisine) {
+        return next(ApiError.badRequest('Кухня с таким названием уже существует.'));
+      }
+  
       const cuisine = await Cuisine.create({ name });
       return res.json(cuisine);
     } catch (e) {
-      next(ApiError.badRequest(e.massage));
+      console.error('Ошибка при создании кухни:', e); // Логирование ошибки на сервере
+      next(ApiError.badRequest(e.message || 'Произошла ошибка при создании кухни.'));
     }
   }
+  
   async getAll(req, res, next) {
     try {
       const cuisines = await Cuisine.findAll();

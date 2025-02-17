@@ -6,8 +6,8 @@ const SelectList = ({ id, options, ...props }) => {
       <select id={id} className={`form-select ${props.className}`}>
         <option selected> Нет выбрано</option>
         {options.map((option, index) => (
-          <option key={index} value={option.value}>
-            {option.label}
+          <option key={index} value={option}>
+            {option}
           </option>
         ))}
       </select>

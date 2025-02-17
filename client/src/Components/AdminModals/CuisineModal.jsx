@@ -3,13 +3,20 @@ import Modal from "../Ui/Modal/Modal";
 import LightButton from "../Ui/LightButton/LightButton";
 import { useInput } from "../../Hooks/useInput";
 import classes from './AdminModals.module.css'
+import CuisinesService from "../../Services/cuisines-service";
 
 const CuisineModal = ({ active, setActive }) => {
-  const cuisine = useInput('', {isEmpty: true, minLengthError: 10 }) 
+  const cuisine = useInput('', {isEmpty: true, minLengthError: 10 })
+  const addCuisine = () =>{
+    CuisinesService.crate({name: cuisine.value}).then(
+    
+    );
+    console.log(cuisine)
+   }   
   return (
     <Modal active={active} setActive={setActive}>
       <label htmlFor="category" className="form-label">
-        Добавить новую категорию  
+        Добавить новую кухни  
       </label>
       {cuisine.isDirty && cuisine.minLengthError && (
           <div className={classes.errorText}> {cuisine.errorText}</div>
@@ -23,7 +30,7 @@ const CuisineModal = ({ active, setActive }) => {
         onChange={(e) => cuisine.onChange(e)}
         required
       />
-      <LightButton disabled={!cuisine.isValid} style={{margin: '5px'}}> Добавить </LightButton>
+      <LightButton disabled={!cuisine.isValid} style={{margin: '5px'}} onClick={addCuisine}> Добавить </LightButton>
     </Modal>
   );
 };

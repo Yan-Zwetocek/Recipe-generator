@@ -21,6 +21,6 @@ router.use("/comment", commentRouter);
 router.use("/ingredient", ingredientRouter);
 router.use("/recipeSteps", recipeStepsRouter);
 router.use("/ratingRouter", ratingRouter);
-router.use("/cuisineRouter", cuisineRouter);
-router.use("/categoryRouter", categoryRouter);
+router.use("/cuisine", cuisineRouter);
+router.use("/category", categoryRouter);
 module.exports = router;

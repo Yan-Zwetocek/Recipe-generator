@@ -3,9 +3,16 @@ import Modal from "../Ui/Modal/Modal";
 import LightButton from "../Ui/LightButton/LightButton";
 import { useInput } from "../../Hooks/useInput";
 import classes from './AdminModals.module.css'
+import  CategoryService from '../../Services/category-service '
 
 const CategoryModal = ({ active, setActive }) => {
   const category = useInput('', {isEmpty: true, minLengthError:3 }) 
+  const addCategory = () =>{
+      CategoryService.crate({name: category.value}).then(
+      
+      );
+      console.log(category)
+     }   
   return (
     <Modal active={active} setActive={setActive}>
       <label htmlFor="category" className="form-label">
@@ -23,7 +30,7 @@ const CategoryModal = ({ active, setActive }) => {
         onChange={(e) => category.onChange(e)}
         required
       />
-      <LightButton disabled={!category.isValid} style={{margin: '5px'}}> Добавить </LightButton>
+      <LightButton disabled={!category.isValid} onClick={addCategory} style={{margin: '5px'}}> Добавить </LightButton>
     </Modal>
   );
 };
