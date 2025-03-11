@@ -84,7 +84,7 @@ class userController {
      const {id} = req.params 
     try {
       const user = await User.findByPk(id, {
-        attributes: ['username', 'role', 'avatar' ],  // Укажите здесь нужные колонки
+        attributes: [ 'id','username', 'role', 'avatar' ],  // Укажите здесь нужные колонки
      });
      
     

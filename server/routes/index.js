@@ -8,6 +8,7 @@ const recipeStepsRouter = require("./recipeStepsRouter");
 const ratingRouter = require("./ratingRouter");
 const cuisineRouter = require("./cuisineRouter");
 const categoryRouter = require("./categoryRouter");
+const dimensionUnitsRouter = require("./dimensionUnitsRouter");
 const { body } = require("express-validator");
 router.use(
   "/user",
@@ -23,4 +24,5 @@ router.use("/recipeSteps", recipeStepsRouter);
 router.use("/ratingRouter", ratingRouter);
 router.use("/cuisine", cuisineRouter);
 router.use("/category", categoryRouter);
+router.use("/dimensionUnits", dimensionUnitsRouter);
 module.exports = router;

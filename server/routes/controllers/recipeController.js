@@ -1,6 +1,6 @@
 const uuid = require("uuid");
 const path = require("path");
-const { Recipe, Recipe_ingredients, Ingredients } = require("../../models/models");
+const { Recipe, Recipe_ingredients, Ingredients, RecipeSteps } = require("../../models/models");
 const ApiError = require("../../error/ApiError");
 
 class recipeController {
@@ -49,24 +49,46 @@ class recipeController {
   async createRecipe(req, res, next) {
     try {
       const {
-        user_id,
+        userId,
         name,
         description,
         time_to_prepare,
-        ingredientIds,
-        categoryId,
-        cuisineId,
+        categoryId, 
+        cuisineId
       } = req.body;
-       const { recipe_img } = req.files;
+
+      // Обработка массивов
+      let ingredientIds = [];
+      let quantities = [];
+      let dimensionUnitIds = [];  // Добавили массив для единиц измерения
+
+      if (Array.isArray(req.body.ingredientIds)) {
+        ingredientIds = req.body.ingredientIds.map(id => parseInt(id, 10));
+        quantities = req.body.quantities.map(qty => parseInt(qty, 10));
+        dimensionUnitIds = req.body.dimensionUnitIds.map(id => parseInt(id, 10)); // Обрабатываем dimensionUnitIds
+      } else if (req.body["ingredientIds[0]"]) {
+        let index = 0;
+        while (req.body[`ingredientIds[${index}]`] !== undefined) {
+          ingredientIds.push(parseInt(req.body[`ingredientIds[${index}]`], 10));
+          quantities.push(parseInt(req.body[`quantities[${index}]`], 10));
+          dimensionUnitIds.push(parseInt(req.body[`dimensionUnitIds[${index}]`], 10)); // Добавили обработку
+          index++;
+        }
+      }
+
+      if (ingredientIds.length === 0) {
+        return res.status(400).json({ error: "No ingredientIds!!!" });
+      }
+
+      const { recipe_img } = req.files;
       let fileName = uuid.v4() + ".jpg";
 
       await recipe_img.mv(
-        path.resolve(__dirname, "../../", "static", "dishes", fileName) 
+        path.resolve(__dirname, "../../", "static", "dishes", fileName)
       );
 
-      
       const recipe = await Recipe.create({
-        user_id,
+        userId,
         name,
         description,
         time_to_prepare,
@@ -75,26 +97,61 @@ class recipeController {
         cuisineId,
       });
 
-      // Добавление ингредиентов к рецепту
-      if (ingredientIds && ingredientIds.length > 0) {
-        const ingredientPromises = ingredientIds.map((ingredientId, index) => {
-          const quantity = req.body[`quantity${index + 1}`]; // Получаем количество по индексу
-          return Recipe_ingredients.create({
+      // Добавляем ингредиенты с dimensionUnitId
+      const ingredientPromises = ingredientIds.map((ingredientId, index) => {
+        return Recipe_ingredients.create({
+          recipe_id: recipe.id,
+          ingredient_id: ingredientId,
+          quantity: quantities[index],
+          dimension_unit_id: dimensionUnitIds[index], 
+        });
+      });
+
+              // Обработка шагов рецепта
+      let steps =[] ;
+      let stepIndex = 0;
+
+      while (req.body[`steps[${stepIndex}][description]`] !== undefined) {
+        let step = {
+          description: req.body[`steps[${stepIndex}][description]`],
+          step_image: req.files && req.files[`steps[${stepIndex}][file]`]
+            ? req.files[`steps[${stepIndex}][file]`]
+            : null,
+        };
+        steps.push(step);
+        stepIndex++;
+      }
+
+      if (steps.length > 0) {
+        const stepsPromises = steps.map((step, index) => {
+          let stepFileName = null;
+
+          if (step.step_image) {
+            stepFileName = uuid.v4() + ".jpg";
+            step.step_image.mv(
+              path.resolve(__dirname, "../../", "static", "steps", stepFileName)
+            );
+          }
+
+          return RecipeSteps.create({
             recipe_id: recipe.id,
-            ingredient_id: ingredientId,
-            quantity: quantity, // Передаем quantity
+            step_number: index + 1,
+            description: step.description,
+            step_image: stepFileName,
           });
         });
 
-        await Promise.all(ingredientPromises);
-      } else {
-        return res.status(400).json({ error: "No ingredientIds!!!" });
+        await Promise.all(stepsPromises);
       }
+
+  
+
+      await Promise.all(ingredientPromises);
 
       return res.json(recipe);
     } catch (e) {
-      console.error("Error in createRecipe:", e); // Вывод полной ошибки
-      next(ApiError.badRequest(e.message)); // Передача ошибки в следующий обработчик
+      console.error("Error in createRecipe:", e);
+      next(ApiError.badRequest(e.message));
     }
   }
 

@@ -1,22 +1,48 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useInput } from "../../../Hooks/useInput";
 import SelectList from "../SelectList/SelectList";
-import classes from './IngredientItem.module.css'
+import classes from "./IngredientItem.module.css";
+import IngredientService from "../../../Services/ingredient-service";
+import DimensionUnitsService from "../../../Services/dimensionUnits-service";
 
-
-const IngredientItem = ({ onDelete, onValidate }) => {
-  // Поля с валидацией
-  const ingredientName = useInput("", { isEmpty: true, minLengthError: 3 });
+const IngredientItem = ({ onDelete, onUpdate }) => {
   const quantity = useInput("", { isEmpty: true });
   const note = useInput("", { isEmpty: true, minLengthError: 3 });
 
-  // Передача общего статуса валидации
-  // useEffect(() => {
-  //   const isValid = ingredientName.isValid && quantity.isValid;
-  //   if (onValidate) {
-  //     onValidate(isValid);
-  //   }
-  // }, [ingredientName.isValid, quantity.isValid, onValidate]);
+  const [ingredients, setIngredients] = useState([]);
+  const [dimensionUnits, setDimensionUnits] = useState([]);
+  const [selectedIngredientId, setSelectedIngredientId] = useState("");
+  const [selectedUnitName, setSelectedUnitName] = useState("");
+
+  useEffect(() => {
+    IngredientService.getAll().then((response) => {
+      setIngredients(response.data); // [{ id, name }]
+    });
+
+    DimensionUnitsService.getAll().then((response) => {
+      setDimensionUnits(response.data); // [{ id, name }]
+    });
+  }, []);
+
+  const handleIngredientChange = (id) => {
+    const idInt = parseInt(id, 10);
+    const selected = ingredients.find((ing) => ing.id === idInt);
+    if (selected) {
+      setSelectedIngredientId(selected.id);
+      onUpdate("ingredientId", selected.id);
+      console.log(selected)
+    }
+  };
+
+  const handleUnitChange = (id) => {
+    const idInt = parseInt(id, 10);
+    const selected = dimensionUnits.find((unit) => unit.id === idInt);
+    if (selected) {
+      setSelectedUnitName(idInt);
+      onUpdate("dimensionUnitId", selected.id); // Передаём `id`, а не `name`
+      console.log(selected)
+    }
+  };
 
   return (
     <div className={classes.container}>
@@ -24,19 +50,12 @@ const IngredientItem = ({ onDelete, onValidate }) => {
         <label htmlFor="ingredient_name" className="form-label">
           Ингредиент
         </label>
-        <input
-          type="text"
-          className={`form-control ${ingredientName.isDirty && !ingredientName.isValid ? "is-invalid" : ""}`}
-          placeholder="Введите название ингредиента"
+        <SelectList
           id="ingredient_name"
-          value={ingredientName.value}
-          onChange={ingredientName.onChange}
-          onBlur={ingredientName.onBlur}
-          required
+          options={ingredients.map((ing) => ing.name)}
+          value={selectedIngredientId}
+          onChange={handleIngredientChange}
         />
-        {ingredientName.isDirty && !ingredientName.isValid && (
-          <div className="invalid-feedback">{ingredientName.errorText}</div>
-        )}
       </div>
 
       <div className="form-group">
@@ -49,32 +68,39 @@ const IngredientItem = ({ onDelete, onValidate }) => {
           id="quantity"
           min="0"
           value={quantity.value}
-          onChange={quantity.onChange}
+          onChange={(e) => {
+            quantity.onChange(e);
+            onUpdate("quantity", e.target.value);
+          }}
           onBlur={quantity.onBlur}
           required
         />
-        {quantity.isDirty && !quantity.isValid && (
-          <div className="invalid-feedback">{quantity.errorText}</div>
-        )}
       </div>
 
       <div className="form-group">
         <label htmlFor="dimension_units" className="form-label">
-          Мера веса/объема:
+          Единица измерения
         </label>
-        <SelectList id="dimension_units" options={[]} className="form-control" />
+        <SelectList
+          id="ingredient_name"
+          options={dimensionUnits.map((unit) => unit.name)}
+          value={selectedUnitName}
+          onChange={handleUnitChange}
+        />
       </div>
 
       <div className="form-group">
         <label htmlFor="note" className="form-label">
           Примечание
         </label>
-       
         <textarea
           className={`form-control ${classes.note_input} ${note.isDirty && !note.isValid ? "is-invalid" : ""}`}
           id="note"
           value={note.value}
-          onChange={note.onChange}
+          onChange={(e) => {
+            note.onChange(e);
+            onUpdate("note", e.target.value);
+          }}
           onBlur={note.onBlur}
         />
       </div>
@@ -87,3 +113,4 @@ const IngredientItem = ({ onDelete, onValidate }) => {
 };
 
 export default IngredientItem;
+ 

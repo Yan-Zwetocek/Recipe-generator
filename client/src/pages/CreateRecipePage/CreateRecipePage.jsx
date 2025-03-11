@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import classes from "./CreateRecipePage.module.css";
 import ColorButton from "../../Components/Ui/ColorButton/ColorButton";
 import LightButton from "../../Components/Ui/LightButton/LightButton";
@@ -6,175 +6,266 @@ import SelectList from "../../Components/Ui/SelectList/SelectList";
 import IngredientItem from "../../Components/Ui/IngredientItem/IngredientItem";
 import CreateStepItem from "../../Components/Ui/CreateStepItem/createStepItem";
 import { useInput } from "../../Hooks/useInput";
+import CuisinesService from "../../Services/cuisines-service";
+import CategoryService from "../../Services/category-service ";
+import RecipeService from "../../Services/recipe-service";
+import { Context } from "../..";
 
-const CreateRecipePage = (props) => {
-  const [fileName, setFileName] = useState(null);
-  const [ingredients, setIngredients] = useState([{}, {}]);
-  const [steps, setSteps] = useState([{}, {}]);
-  const [stepValidation, setStepValidation] = useState([]);
-  const [ingredientValidation, setIngredientValidation] = useState([]);
 
-  // Используем хук useInput для полей
+const CreateRecipePage = () => {
+  const [file, setFile] = useState(null);
+  const [steps, setSteps] = useState([
+    { description: "", file: null },
+    { description: "", file: null },
+  ]);
+  const [cuisine, setCuisine] = useState([]);
+  const [category, setCategory] = useState([]);
+  const [selectedCuisineId, setSelectedCuisineId] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [ingredients, setIngredients] = useState([
+    {  quantity: "" },
+    {  quantity: "" },
+  ]);
+    const { user,  } = useContext(Context);
+    const userId = user._user.data.id
+  
+  useEffect(() => {
+    CuisinesService.getAll().then((response) => {
+      const cuisineName = response.data.map((cuisine) => cuisine.name);
+      const cuisineId = response.data.map((cuisine) => cuisine.id);
+      setCuisine(cuisineName);
+    });
+    CategoryService.getAll().then((response) => {
+      const categoryName = response.data.map((category) => category.name);
+      const categoryId = response.data.map((category) => category.id);
+      setCategory(categoryName)
+    });
+    
+  }, []);
   const recipeName = useInput("", { isEmpty: true, minLengthError: 3 });
   const recipeDescription = useInput("", { isEmpty: true, minLengthError: 10 });
   const timeToPrepare = useInput("", { isEmpty: true });
 
   const handleFileChange = (event) => {
-    setFileName(event.target.files[0].name);
+    setFile(event.target.files[0]);
   };
 
   const handleDeleteIngredient = (index) => {
     if (ingredients.length > 2) {
-      const updatedIngredients = [...ingredients];
-      updatedIngredients.splice(index, 1);
-      setIngredients(updatedIngredients);
+      setIngredients(ingredients.filter((_, i) => i !== index));
     } else {
-      alert(" В рецепте должно быть как минимум 2 ингредиента");
+      alert("В рецепте должно быть минимум 2 ингредиента");
     }
   };
 
   const handleDeleteSteps = (index) => {
     if (steps.length > 2) {
-      const updatedSteps = [...steps];
-      updatedSteps.splice(index, 1);
-      setSteps(updatedSteps);
+      setSteps(steps.filter((_, i) => i !== index));
     } else {
-      alert(" В рецепте должно быть как минимум 2 шага");
+      alert("В рецепте должно быть минимум 2 шага");
     }
   };
 
-  const addIngredients = () => {
-    setIngredients([...ingredients, {}]);
+  const updateIngredient = (index, key, value) => {
+    setIngredients((prev) =>
+      prev.map((ing, i) => (i === index ? { ...ing, [key]: value } : ing))
+    );
+  };
+  const handleIngredientUpdate = (index, field, value) => {
+    setIngredients((prev) => {
+      const updated = [...prev];
+      if (!updated[index]) updated[index] = {};
+      updated[index][field] = value;
+      return updated;
+    });
+  };
+   
+
+  const updateStep = (index, text, file) => {
+    setSteps((prev) =>
+      prev.map((step, i) =>
+        i === index ? { ...step, description: text, file: file } : step
+      )
+    );
   };
 
-  const addSteps = () => {
-    setSteps([...steps, {}]);
-  };
-
-  const handleSubmit = (e) => {
+  const addRecipe = async (e) => {
     e.preventDefault();
+  
+    if (recipeName.minLengthError) {
+      alert("Введите название рецепта!");
+      return;
+    }
     
-    const areAllIngredientsValid = ingredientValidation.every(Boolean);
-    const areAllStepsValid = stepValidation.every(Boolean);
+    if (recipeDescription.minLengthError) {
+      alert("Введите описание рецепта!");
+      return;
+    }
     
-    if (recipeName.isValid && recipeDescription.isValid && timeToPrepare.isValid && areAllIngredientsValid && areAllStepsValid) {
-      alert("рецепт успешно отправлена!");
-      
-    } else {
-      alert("Исправьте ошибки в форме.");
+    if (timeToPrepare.isEmpty) {
+      alert("Укажите время на приготовление!");
+      return;
+    }
+    
+    if (!selectedCuisineId) {
+      alert("Выберите кухню!");
+      return;
+    }
+    
+    if (!selectedCategoryId) {
+      alert("Выберите категорию!");
+      return;
+    }
+    
+     const missingIngredient = ingredients.find(ing => !ing.ingredientId || !ing.quantity || !ing.dimensionUnitId);
+     if (missingIngredient) {
+       alert("Заполните все ингредиенты корректно!" , ingredients.id, ingredients.quantity);
+       console.log( ingredients[0], ingredients[0].quantity)
+       return;
+     }
+    
+    const missingStep = steps.find(step => !step.description);
+    if (missingStep) {
+      alert("Заполните все шаги!");
+      return;
+    }
+    
+    
+    
+  
+    const formData = new FormData();
+    formData.append("userId", userId);
+    formData.append("name", recipeName.value);
+    formData.append("description", recipeDescription.value);
+    formData.append("time_to_prepare", timeToPrepare.value);
+    formData.append("cuisineId", selectedCuisineId);
+    formData.append("categoryId", selectedCategoryId);
+  
+    ingredients.forEach((ingredient, index) => {
+      formData.append(`ingredientIds[${index}]`, ingredient.ingredientId);
+      formData.append(`quantities[${index}]`, ingredient.quantity);
+      formData.append(`dimensionUnitIds[${index}]`, ingredient.dimensionUnitId); // Теперь передаём ID единицы измерения
+      formData.append(`notes[${index}]`, ingredient.note || "");
+    });
+  
+    steps.forEach((step, index) => {
+      formData.append(`steps[${index}][description]`, step.description);
+      if (step.file) {
+        formData.append(`steps[${index}][file]`, step.file);
+      }
+    });
+  
+    if (file) {
+      formData.append("recipe_img", file);
+    }
+  
+    try {
+      console.log([...formData.entries()]);
+      await RecipeService.create(formData);
+      alert("Рецепт успешно создан!");
+    } catch (e) {
+      console.error("Ошибка при создании рецепта:", e);
+      alert("Ошибка при отправке данных");
     }
   };
-  
-
-  const handleIngredientValidation = (index, isValid) => {
-    const updatedValidation = [...ingredientValidation];
-    updatedValidation[index] = isValid; // Обновляем статус для конкретного ингредиента
-    setIngredientValidation(updatedValidation);
-  };
-
-  const handleStepValidation = (index, isValid) => {
-    const updatedValidation = [...stepValidation];
-    updatedValidation[index] = isValid; // Обновляем статус для конкретного шага
-    setStepValidation(updatedValidation);
-  };
-  
 
   return (
     <div className={classes.container}>
-      <label htmlFor="form" className="h3 fw-bold">
-        Добавить рецепт
-      </label>
-      <form className={classes.form} id="form" onSubmit={handleSubmit}>
-        <label htmlFor="recipe_name" className="form-label">
-          Название рецепта
-        </label>
+      <h3 className="fw-bold">Добавить рецепт</h3>
+      <form className={classes.form}>
+        <label>Название рецепта</label>
         <input
           type="text"
           className={`form-control ${
             recipeName.isDirty && recipeName.minLengthError ? classes.error : ""
           }`}
           placeholder="Введите название"
-          id="recipe_name"
-          onBlur={(e) => recipeName.onBlur(e)}
-          onChange={(e) => recipeName.onChange(e)}
+          onBlur={recipeName.onBlur}
+          onChange={recipeName.onChange}
         />
         {recipeName.isDirty && recipeName.minLengthError && (
           <div className={classes.errorText}>{recipeName.errorText}</div>
         )}
 
-        <label htmlFor="recipe_description" className="form-label">
-          Описание рецепта
-        </label>
+        <label>Описание рецепта</label>
         <textarea
           className={`form-control ${
             recipeDescription.isDirty && recipeDescription.minLengthError
               ? classes.error
               : ""
           }`}
-          id="recipe_description"
           rows="3"
-          value={recipeDescription.value}
-          onChange={recipeDescription.onChange}
           onBlur={recipeDescription.onBlur}
+          onChange={recipeDescription.onChange}
         ></textarea>
         {recipeDescription.isDirty && recipeDescription.minLengthError && (
           <div className={classes.errorText}>{recipeDescription.errorText}</div>
         )}
 
-        <label htmlFor="time_to_prepare" className="form-label">
-          Время приготовления в минутах
-        </label>
+        <label>Время приготовления (мин.)</label>
         <input
           type="number"
-          className={`form-control ${classes.short__input} ${
+          className={`form-control ${
             timeToPrepare.isDirty && timeToPrepare.isEmpty ? classes.error : ""
           }`}
-          id="time_to_prepare"
-          value={timeToPrepare.value}
-          onChange={timeToPrepare.onChange}
           onBlur={timeToPrepare.onBlur}
+          onChange={timeToPrepare.onChange}
           min="0"
         />
         {timeToPrepare.isDirty && timeToPrepare.isEmpty && (
           <div className={classes.errorText}>{timeToPrepare.errorText}</div>
         )}
 
-        {/* Остальная часть формы остается неизменной */}
-        <label htmlFor="ingredient__form" className="h3 fw-bold">
-          Добавить ингредиент
-        </label>
-        <div id="ingredient__form" className={classes.ingredient__form}>
+        <SelectList
+          options={cuisine}
+          value={selectedCuisineId}
+          onChange={setSelectedCuisineId}
+        />
+        <SelectList
+          options={category}
+          value={selectedCategoryId}
+          onChange={setSelectedCategoryId}
+        />
+
+<div className={classes.ingredient__form }>
           {ingredients.map((ingredient, index) => (
             <IngredientItem
-              onValidate={(isValid) =>
-                handleIngredientValidation(index, isValid)
-              }
+             className={classes.ingredient__form}
               key={index}
+              ingredient={ingredient}
+              onUpdate={(key, value) => updateIngredient(index, key, value)}
               onDelete={() => handleDeleteIngredient(index)}
             />
           ))}
-          <LightButton onClick={addIngredients}>
+          <LightButton
+            onClick={() =>
+              setIngredients([...ingredients, { id: null, quantity: "" }])
+            }
+          >
             Добавить ингредиент
           </LightButton>
-        </div>
-        <label htmlFor="stepForm" className="h3 fw-bold">
-          Добавить шаги
-        </label>
-        <div id="stepForm" className={classes.step__form}>
+  
+</div>
+        <h3 className="fw-bold">Добавить шаги</h3>
+       <div className={classes.step__form}>
           {steps.map((step, index) => (
             <CreateStepItem
               key={index}
               onDelete={() => handleDeleteSteps(index)}
-              onValidate={(isValid) => handleStepValidation(index, isValid)}
+              onUpdate={(text, file) => updateStep(index, text, file)}
             />
           ))}
-          <LightButton onClick={() => addSteps()}>Добавить шаг</LightButton>
-        </div>
-        <label htmlFor="foto__button" className="form-label">
-          Основное фото рецепта
-        </label>
+          <LightButton
+            onClick={() => setSteps([...steps, { description: "", file: null }])}
+            className={classes}
+          >
+            Добавить шаг
+          </LightButton>
+  
+       </div>
+        <label>Основное фото рецепта</label>
         <div className="d-flex align-items-center">
-          <ColorButton id="foto__button" className={classes.foto__button}>
+        <ColorButton id="foto__button" className={classes.foto__button}>
             Выбрать фото
             <input
               type="file"
@@ -183,13 +274,10 @@ const CreateRecipePage = (props) => {
               onChange={handleFileChange}
             />
           </ColorButton>
-          {fileName ? (
-            <span className={classes.fileName}>{fileName}</span>
-          ) : (
-            <span className={classes.fileName}>файла не выбран </span>
-          )}
+          <span>{file ? file.name : "файл не выбран"}</span>
         </div>
-        <ColorButton type="submit" className={classes.submitButton}>
+
+        <ColorButton type="submit" onClick={addRecipe}>
           Сохранить рецепт
         </ColorButton>
       </form>

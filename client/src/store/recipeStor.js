@@ -72,7 +72,7 @@ export default class RecipeStore {
     makeAutoObservable(this);
   }
 
-  get recipes() {
+  get getRecipes() {
     return this._recipes;
   }
 
@@ -90,5 +90,8 @@ export default class RecipeStore {
 
   setSelectedRecipe(recipe) {
     this._selectedRecipe = recipe;
+  }
+  setRecipes(recipes) {
+    this._recipes = recipes;
   }
 }

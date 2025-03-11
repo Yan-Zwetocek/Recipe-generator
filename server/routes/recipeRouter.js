@@ -7,7 +7,7 @@ const checkRole = require("../middleware/checkRoleMiddleware");
 router.get("/",  recipeController.getAllRecipe);
 router.post("/", authMiddleware, recipeController.createRecipe);
 router.get('/:id', recipeController.getRecipeById)
-router.delete('/:id', recipeController.deleteRecipeById)
+router.delete('/:id', checkRole('ADMIN'), authMiddleware, recipeController.deleteRecipeById)
 router.put('/:id', checkRole('ADMIN'), authMiddleware, recipeController.updateRecipe)
 
 module.exports = router;

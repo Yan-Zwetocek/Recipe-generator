@@ -1,16 +1,27 @@
 import React from "react";
 import Modal from "../Ui/Modal/Modal";
 import LightButton from "../Ui/LightButton/LightButton";
-import { useInput } from "../../Hooks/useInput"
-import classes from './AdminModals.module.css'
+import { useInput } from "../../Hooks/useInput";
+import classes from "./AdminModals.module.css";
+import IngredientService from "../../Services/ingredient-service";
 const IngredientModal = ({ active, setActive }) => {
-  const ingredientName = ("", { isEmpty: true, minLengthError: 3 });
+  const ingredientName = useInput("", { isEmpty: true, minLengthError: 3 });
   const calories = useInput("", { isEmpty: true });
   const protein = useInput("", { isEmpty: true });
   const fat = useInput("", { isEmpty: true });
   const carbs = useInput("", { isEmpty: true });
+  const dimensionUnits = useInput("", { isEmpty: true });
 
- 
+  const addIngredient = () => {
+    IngredientService.crate({
+      name: ingredientName.value,
+      calories: calories.value,
+      fat: fat.value,
+      carbs: carbs.value,
+      protein: protein.value,
+    }).then();
+    console.log(ingredientName.value)
+  };
   return (
     <Modal active={active} setActive={setActive}>
       <form>
@@ -20,24 +31,29 @@ const IngredientModal = ({ active, setActive }) => {
           </label>
           <input
             type="text"
-            className={`form-control ${ingredientName.isDirty && !ingredientName.isEmailError ? classes.error : ""}`}
+            className={`form-control ${
+              ingredientName.isDirty && !ingredientName.isEmailError
+                ? classes.error
+                : ""
+            }`}
             placeholder="Введите название ингредиента"
             id="ingredient"
             value={ingredientName.value}
             onChange={ingredientName.onChange}
             onBlur={ingredientName.onBlur}
           />
-          {ingredientName.isDirty && ingredientName.errorText && (
-            <p className={classes.errorText}>{ingredientName.errorText}</p>
-          )}
+        
+        
         </div>
         <div className="form-group">
           <label htmlFor="calories" className="form-label">
-            Калории (ккал):
+            Калории в 100г (ккал):
           </label>
           <input
             type="number"
-             className={`form-control ${calories.isDirty && !calories.isEmpty ? classes.error : ""}`}
+            className={`form-control ${
+              calories.isDirty && !calories.isEmpty ? classes.error : ""
+            }`}
             id="calories"
             value={calories.value}
             onChange={calories.onChange}
@@ -50,11 +66,13 @@ const IngredientModal = ({ active, setActive }) => {
         </div>
         <div className="form-group">
           <label htmlFor="protein" className="form-label">
-            Белки (г):
+            Белки в 100г (г):
           </label>
           <input
             type="number"
-            className={`form-control ${protein.isDirty && !protein.isEmpty ? classes.error : ""}`}
+            className={`form-control ${
+              protein.isDirty && !protein.isEmpty ? classes.error : ""
+            }`}
             id="protein"
             value={protein.value}
             onChange={protein.onChange}
@@ -67,11 +85,13 @@ const IngredientModal = ({ active, setActive }) => {
         </div>
         <div className="form-group">
           <label htmlFor="fat" className="form-label">
-            Жиры (г):
+            Жиры в 100г (г):
           </label>
           <input
             type="number"
-            className={`form-control ${fat.isDirty && !fat.isEmpty ? classes.error : ""}`}
+            className={`form-control ${
+              fat.isDirty && !fat.isEmpty ? classes.error : ""
+            }`}
             id="fat"
             value={fat.value}
             onChange={fat.onChange}
@@ -84,11 +104,13 @@ const IngredientModal = ({ active, setActive }) => {
         </div>
         <div className="form-group">
           <label htmlFor="carbs" className="form-label">
-            Углеводы (г):
+            Углеводы в 100г (г):
           </label>
           <input
             type="number"
-            className={`form-control ${carbs.isDirty && !carbs.isEmailError ? classes.error : ""}`}
+            className={`form-control ${
+              carbs.isDirty && !carbs.isEmailError ? classes.error : ""
+            }`}
             id="carbs"
             value={carbs.value}
             onChange={carbs.onChange}
@@ -99,7 +121,16 @@ const IngredientModal = ({ active, setActive }) => {
             <p className={classes.errorText}>{carbs.errorText}</p>
           )}
         </div>
-        <LightButton disabled={!calories.isValid || !carbs.isValid || !fat.isValid || !protein.isValid} style={{ margin: "5px" }}>
+        <LightButton
+          disabled={
+            !calories.isValid ||
+            !carbs.isValid ||
+            !fat.isValid ||
+            !protein.isValid 
+          }
+          style={{ margin: "5px" }}
+          onClick={addIngredient}
+        >
           Добавить
         </LightButton>
       </form>
@@ -108,4 +139,3 @@ const IngredientModal = ({ active, setActive }) => {
 };
 
 export default IngredientModal;
-
