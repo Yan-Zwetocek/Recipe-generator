@@ -1,26 +1,27 @@
-import React from 'react'; 
-import classes from './RecipeItem.module.css';  
-import ColorButton from '../Ui/ColorButton/ColorButton'; 
-
-const RecipeItem = (props) => { 
-    return ( 
-        <div className={classes.container}>  
-            <div className={classes.dish__box}> 
-                <h1>Драники</h1> 
-                <div className={classes.dish__info}> 
-                    <div className={classes.picture__box}>
-                    <img src="/f5c05cafde7fde4e115cebce0bc5b4c0.jpg" alt="dish picture" /> 
-
-                        </div> 
-                </div> 
-                <p> 
-                    Далеко-далеко за словесными, горами в стране гласных и согласных живут рыбные тексты. Приставка языкового за текста, свою города прямо рекламных, вершину рыбного заманивший лучше страна пояс. Вопрос, жизни. Заголовок журчит дал коварный которой деревни безопасную ручеек рукописи семь вскоре они букв, послушавшись, свой дороге жизни продолжил текстов реторический. Залетают продолжил назад подзаголовок его встретил букв собрал всеми дорогу! Послушавшись оксмокс снова дороге речью, силуэт имени! Текстами они точках рот приставка взгляд знаках даль родного щеке она вскоре, сбить большой толку курсивных lorem букв путь города ipsum рекламных меня жизни коварный маленький. Рыбного великий точках возвращайся силуэт строчка. Безопасную собрал океана всемогущая о вершину она, то дал ты использовало пунктуация строчка которой деревни злых текст. Заманивший но рукопись на берегу всемогущая от всех даль напоивший там которое агентство. Переписали заманивший родного пояс агентство силуэт запятой букв ручеек необходимыми если послушавшись всеми даль, журчит вершину единственное ее текстов раз над деревни от всех свой ipsum переулка моей. Пустился она журчит деревни рот рекламных свою безорфографичный страну продолжил взобравшись не заманивший жаренные повстречался страна, подпоясал одна! Дал составитель, предложения ее дороге бросил проектах страну рыбного о заглавных океана решила. Своего подпоясал, парадигматическая ручеек буквоград грамматики которой журчит пунктуация ведущими проектах собрал, толку реторический, снова домах предупредила путь запятых.
-
-                </p> 
-                <ColorButton>Полный рецепт</ColorButton> 
-            </div> 
-        </div> 
-    ); 
-} 
+import React from "react";
+import classes from "./RecipeItem.module.css";
+import ColorButton from "../Ui/ColorButton/ColorButton";
+import { Image } from "react-bootstrap";
+import {useNavigate} from 'react-router-dom'
+import { RECIPE_ROUTE } from "../../utils/consts";
+const RecipeItem = ({ recipe }) => {
+  const navigate = useNavigate()
+  return (
+    <div className={classes.container}>
+      <div className={classes.dish__box}>
+        <h1>{recipe.name}</h1>
+        <div className={classes.dish__info}>
+          <div className={classes.picture__box}>
+        <Image src={ process.env.REACT_APP_API_URL + recipe.recipe_img}/>
+          </div>
+        </div>
+        <p>
+            {recipe.description}
+        </p>
+      <ColorButton onClick={()=> navigate(RECIPE_ROUTE +'/' + recipe.id)}>Полный рецепт</ColorButton>
+      </div>
+    </div>
+  );
+};
 
 export default RecipeItem;

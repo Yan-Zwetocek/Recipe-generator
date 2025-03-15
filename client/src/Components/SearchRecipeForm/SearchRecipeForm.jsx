@@ -13,6 +13,7 @@ const SearchRecipeForm = (props) => {
 
   useEffect(() => {
     CuisinesService.getAll().then((response) => {
+      
       const names = response.data.map((cuisine) => cuisine.name);
       setCuisineNames(names);
     });

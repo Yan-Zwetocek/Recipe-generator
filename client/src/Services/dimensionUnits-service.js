@@ -7,6 +7,9 @@ export default class dimensionUnitsService{
     static async getAll (){
         return $host.get('api/dimensionUnits')
       } 
+    static async getById (id){
+        return $host.get(`api/dimensionUnits/getById/${id}`)
+      } 
     static async updateById (id){
         return $authHost.put(`api/dimensionUnits/updateById/${id}`)
       } 

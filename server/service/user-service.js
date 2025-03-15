@@ -37,7 +37,7 @@ class userService {
       avatar: fileName,
     });
 
-    const favourites = await Favourites.create({ userId: user.id });
+   
     const userDto = new UserDto(user);
     await mailService.sendActivationLink(
       email,

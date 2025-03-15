@@ -1,6 +1,6 @@
 const uuid = require("uuid");
 const path = require("path");
-const { Recipe, Recipe_ingredients, Ingredients, RecipeSteps } = require("../../models/models");
+const { Recipe, Recipe_ingredients, Ingredients, RecipeSteps, DimensionUnits } = require("../../models/models");
 const ApiError = require("../../error/ApiError");
 
 class recipeController {
@@ -157,23 +157,55 @@ class recipeController {
 
   async getRecipeById(req, res, next) {
     try {
-     const { id } = req.params;
-     const recipe = await Recipe.findByPk(id, {
-      include: [{ model: Recipe_ingredients }],
-    });
-    
-   
-     if (!recipe) {
-      return res.status(404).json({ error: "Recipe not found" });
-     }
-   
-     return res.json(recipe);
+      const { id } = req.params;
+      const recipe = await Recipe.findByPk(id, {
+        include: [
+          {
+            model: Ingredients,
+            through: {
+              attributes: ["quantity"],
+            },
+            attributes: [
+              "id",
+              "name",
+              "protein_content",
+              "fat_content",
+              "carbohydrate_content",
+              "calorie_content",
+            ],
+            include: [
+              {
+                model: Recipe_ingredients,
+                as: "recipeIngredients", // Указываем алиас
+                attributes: ["quantity"],
+                include: [
+                  {
+                    model: DimensionUnits,
+                    attributes: ["id", "name"], // Получаем данные об единицах измерения
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            model: RecipeSteps,
+            order: [["step_number", "ASC"]],
+          },
+        ],
+      });
+      
+      
+      if (!recipe) {
+        return res.status(404).json({ error: "Recipe not found" });
+      }
+  
+      return res.json(recipe);
     } catch (e) {
-     console.error("Error in getRecipeById:", e);
-     next(ApiError.badRequest(e.message));
+      console.error("Error in getRecipeById:", e);
+      next(ApiError.badRequest(e.message));
     }
-   }
-     
+  }
+  
 
   async deleteRecipeById(req, res, next) {
     try {

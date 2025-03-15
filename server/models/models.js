@@ -12,7 +12,7 @@ const User = sequelize.define("user", {
   role: { type: DataTypes.STRING, defaultValue: "USER" },
 });
 
-const Favourites = sequelize.define("favourites", {});
+
 const Comment = sequelize.define("comment", {
   id: { type: DataTypes.INTEGER, primaryKey: true, unique: true, autoIncrement: true },
   comment_text: { type: DataTypes.TEXT },
@@ -23,7 +23,6 @@ const Recipe = sequelize.define("recipe", {
   name: { type: DataTypes.STRING, unique: true },
   description: { type: DataTypes.TEXT },
   time_to_prepare: { type: DataTypes.INTEGER },
-  rating: { type: DataTypes.INTEGER },
   recipe_img: { type: DataTypes.STRING, allowNull: true },
 });
 
@@ -48,10 +47,6 @@ const DimensionUnits = sequelize.define("dimension_units", {
   name: { type: DataTypes.STRING, unique: true, allowNull: false },
 });
 
-const Rating = sequelize.define("rating", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, unique: true, autoIncrement: true },
-  rate: { type: DataTypes.INTEGER },
-});
 
 const Category = sequelize.define("category", {
   id: { type: DataTypes.INTEGER, primaryKey: true, unique: true, autoIncrement: true },
@@ -78,8 +73,7 @@ const Recipe_ingredients = sequelize.define("recipe_ingredients", {
 
 // --- Ассоциации ---
 // Пользователь и избранное
-User.hasOne(Favourites);
-Favourites.belongsTo(User);
+
 
 // Пользователь и комментарии
 User.hasMany(Comment);
@@ -90,16 +84,13 @@ User.hasMany(Recipe);
 Recipe.belongsTo(User, { foreignKey: { allowNull: true } });
 
 // Пользователь и рейтинг
-User.hasMany(Rating);
-Rating.belongsTo(User);
+
 
 // Рецепт и комментарии (при удалении рецепта удаляются комментарии)
 Recipe.hasMany(Comment, { onDelete: "CASCADE", onUpdate: "CASCADE" });
 Comment.belongsTo(Recipe);
 
-// Рецепт и рейтинг (при удалении рецепта удаляются рейтинги)
-Recipe.hasMany(Rating, { onDelete: "CASCADE", onUpdate: "CASCADE" });
-Rating.belongsTo(Recipe);
+
 
 // Рецепт и категория
 Recipe.belongsTo(Category);
@@ -121,14 +112,30 @@ Ingredients.belongsToMany(Recipe, { through: Recipe_ingredients, foreignKey: "in
 Recipe_ingredients.belongsTo(DimensionUnits, { foreignKey: "dimension_unit_id" });
 DimensionUnits.hasMany(Recipe_ingredients);
 
+Recipe_ingredients.belongsTo(Ingredients, {
+  foreignKey: "ingredient_id",
+  as: 'ingredient', // Добавил алиас, чтобы было удобнее обращаться к ингредиенту
+});
+Ingredients.hasMany(Recipe_ingredients, {
+  foreignKey: "ingredient_id",
+  as: 'recipeIngredients', // Добавил алиас
+});
+
+Recipe_ingredients.belongsTo(Recipe, {
+  foreignKey: "recipe_id",
+  as: 'recipe', // Добавил алиас
+});
+Recipe.hasMany(Recipe_ingredients, {
+  foreignKey: "recipe_id",
+  as: 'recipeIngredients', // Добавил алиас
+});
+
 module.exports = {
   User,
-  Favourites,
   Comment,
   Recipe,
   Ingredients,
   Recipe_ingredients,
-  Rating,
   RecipeSteps,
   Cuisine,
   Category,

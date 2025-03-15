@@ -18,7 +18,7 @@ export default class RecipeService {
 
   // Получение рецепта по ID
   static async getById(id) {
-    return $host.get(`api/recipes/${id}`);
+    return $host.get(`api/recipe/${id}`);
   }
 
   // Обновление рецепта по ID

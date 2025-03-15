@@ -1,21 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import classes from "./createStepItem.module.css";
 import LightButton from "../LightButton/LightButton";
 import { useInput } from "../../../Hooks/useInput";
 
-const CreateStepItem = ({ onDelete, onValidate }) => {
+const CreateStepItem = ({ onDelete, onValidate, onUpdate }) => {
   const [fileName, setFileName] = useState(null);
+  const [file, setFile] = useState(null);
   const text = useInput("", { isEmpty: true, minLengthError: 10 });
 
-  // useEffect(() => {
-  //   if (onValidate) {
-  //     onValidate(text.isValid);
-  //   }
-  // }, [text.isValid, onValidate]);
-
-  // const handleFileChange = (event) => {
-  //   setFileName(event.target.files[0].name);
-  // };
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setFileName(selectedFile.name);
+      onUpdate && onUpdate(text.value, selectedFile);
+    }
+  };
 
   return (
     <div className={classes.container}>
@@ -25,16 +25,15 @@ const CreateStepItem = ({ onDelete, onValidate }) => {
           id="text"
           className={`form-control ${text.isDirty && !text.isValid ? "is-invalid" : ""}`}
           onBlur={(e) => text.onBlur(e)}
-          onChange={(e) => text.onChange(e)}
+          onChange={(e) => {
+            text.onChange(e);
+            onUpdate && onUpdate(e.target.value, file);
+          }}
         ></textarea>
         {text.isDirty && !text.isValid && <div className="invalid-feedback">{text.errorText}</div>}
-        <span className={classes.delete__button} onClick={() => onDelete()}>
-          Удалить
-        </span>
+        <span className={classes.delete__button} onClick={onDelete}>Удалить</span>
       </div>
-      <label htmlFor="step__foto-button" className="form-label">
-        Выбрать фото шага
-      </label>
+      <label htmlFor="step__foto-button" className="form-label">Выбрать фото шага</label>
       <div className="d-flex align-items-center">
         <LightButton className={classes.step__foto__button}>
           Выбрать фото
@@ -42,14 +41,10 @@ const CreateStepItem = ({ onDelete, onValidate }) => {
             type="file"
             className={classes.step__foto__input}
             accept="image/*"
-            // onChange={handleFileChange}
+            onChange={handleFileChange}
           />
         </LightButton>
-        {fileName ? (
-          <span className={classes.fileName}>{fileName}</span>
-        ) : (
-          <span className={classes.fileName}>файла не выбран </span>
-        )}
+        <span className={classes.fileName}>{fileName || "файл не выбран"}</span>
       </div>
     </div>
   );

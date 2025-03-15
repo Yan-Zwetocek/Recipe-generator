@@ -8,7 +8,7 @@ const StepItem = ({ stepText, number, img, ...props}) => {
       <p> {stepText}</p>
    </div>
    <div className={classes.step__img}>
-   <img src={img} alt='фото шага' />
+   {img ? <img src={img} alt='фото шага' /> : <div> Фото отсутствует  </div>}
    </div>
 
   </div>
