@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import DOMPurify from "dompurify"; // ✅ Импортируем DOMPurify
 import ColorButton from "../ColorButton/ColorButton";
 import CommentService from "../../../Services/comment-service";
 import { Image } from "react-bootstrap";
@@ -22,7 +23,7 @@ const CommentSection = ({ recipeId }) => {
       }
     };
     fetchComments();
-  }, [recipeId, ]);
+  }, [recipeId]);
 
   const handleCommentChange = (e) => {
     setCommentText(e.target.value);
@@ -30,14 +31,29 @@ const CommentSection = ({ recipeId }) => {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
+  
+    if (!user) {
+      setError("Вы должны войти в систему, чтобы оставить комментарий.");
+      return;
+    }
+  
+    // Очищаем ввод перед отправкой
+    const sanitizedText = DOMPurify.sanitize(commentText);
+  
+    // Проверяем, изменился ли текст после очистки (значит, был вредоносный код)
+    if (sanitizedText !== commentText) {
+      setError("Ваш комментарий содержит недопустимые символы.");
+      return;
+    }
+  
     if (commentText.trim()) {
       try {
-        const newComment = await CommentService.crate({ 
+        const newComment = await CommentService.crate({
           recipeId: recipeId,
-          commentText: commentText, 
-          userId: user._user.data.id,
+          commentText: sanitizedText, // Отправляем уже очищенный текст
+          userId: user.id,
         });
-
+  
         setComments([...comments, newComment.data]);
         setCommentText("");
         setError(null);
@@ -72,32 +88,15 @@ const CommentSection = ({ recipeId }) => {
         <ul className="list-group">
           {comments.map((comment, index) => (
             <li key={index} className="list-group-item">
-              <div style={{ display: "flex", alignItems: "center" }}>                {/* Отображаем аватар или круг с логотипом */}
-                {comment.user ? ( // Проверяем существование comment.user
-                  comment.user.avatar ? ( // Затем проверяем существование comment.user.avatar
-                    <Image
-                      src={comment.user.avatar}
-                      alt={comment.user.username}
-                      width={30}
-                      height={30}
-                      roundedCircle
-                    />
-                  ) : (
-                    <div
-                      style={{
-                        width: "30px",
-                        height: "30px",
-                        borderRadius: "50%",
-                        backgroundColor: "#ff7b00",
-                        marginRight: "8px",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Image src="/logo/chef-svgrepo-com (1).svg" width={20} height={20} />
-                    </div>
-                  )
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {comment.user?.avatar ? (
+                  <Image
+                    src={comment.user.avatar}
+                    alt={comment.user.username}
+                    width={30}
+                    height={30}
+                    roundedCircle
+                  />
                 ) : (
                   <div
                     style={{
@@ -114,9 +113,9 @@ const CommentSection = ({ recipeId }) => {
                     <Image src="/logo/chef-svgrepo-com (1).svg" width={20} height={20} />
                   </div>
                 )}
-                {comment.user && <span>{comment.user.username}</span>}
+               
               </div>
-              {comment.comment_text}
+              <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(comment.comment_text) }} />
             </li>
           ))}
         </ul>
@@ -125,4 +124,4 @@ const CommentSection = ({ recipeId }) => {
   );
 };
 
-export default CommentSection; 
+export default CommentSection;
