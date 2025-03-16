@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react"; // useState нужен для индикатора загрузки
+
+import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import { Context } from "../../index";
 import { observer } from "mobx-react-lite";
@@ -16,100 +17,110 @@ const RecipePage = observer(() => {
   const { recipe } = useContext(Context);
   const [isLoading, setIsLoading] = useState(true);
   const [currentRecipe, setCurrentRecipe] = useState(null);
-  const [recipeCreateUser, setRecipeCreateUser] = useState(null); // Добавляем состояние для currentRecipe
+  const [recipeCreateUser, setRecipeCreateUser] = useState(null);
+  const [error, setError] = useState(null); // Состояние для хранения ошибки
 
   useEffect(() => {
-    setIsLoading(true);
-
     const fetchData = async () => {
+      setIsLoading(true);
+      setError(null); // Сбрасываем ошибку при новом запросе
       try {
-        const response = await RecipeService.getById(id);
-        setCurrentRecipe(response.data);
-        console.log(currentRecipe);
-      } catch (error) {
-        console.error("Ошибка при загрузке рецепта:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    const fetchUserData = async () => {
-      try {
-        const response = await authService.getUserById(currentRecipe.userId);
-        setRecipeCreateUser(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error("Ошибка при загрузке пользователя:", error);
+        const recipeResponse = await RecipeService.getById(id);
+        setCurrentRecipe(recipeResponse.data);
+
+        const userResponse = await authService.getUserById(
+          recipeResponse.data.userId
+        );
+        setRecipeCreateUser(userResponse.data);
+      } catch (e) {
+        console.error("Ошибка при загрузке данных:", e);
+        setError("Не удалось загрузить данные. Попробуйте позже.");
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchData();
-    fetchUserData();
-  }, []);
+  }, [id]);
 
   if (isLoading) {
     return <Spinner animation="border" />;
   }
 
+  if (error) {
+    return <div>Ошибка: {error}</div>;
+  }
+
   if (!currentRecipe) {
     return <div>Рецепт не найден</div>;
   }
+
   const ingredients = currentRecipe.ingredients;
 
-  const totalBJUAndCalories = ingredients.reduce((acc, ingredient) => {
-    if (ingredient) {
-      const quantity = ingredient.recipeIngredients[0].quantity;
-  
-     
-  
-      const proteinCalories = Math.round(ingredient.protein_content * quantity * 4);
-      const fatCalories = Math.round(ingredient.fat_content * quantity * 9);
-      const carbCalories = Math.round(ingredient.carbohydrate_content * quantity * 4);
-  
-      acc.calories += proteinCalories + fatCalories + carbCalories;
-      acc.protein += ingredient.protein_content * quantity; // Убрали Math.round()
-      acc.fat += ingredient.fat_content * quantity; // Убрали Math.round()
-      acc.carbs += ingredient.carbohydrate_content * quantity; // Убрали Math.round()
-    }
-    return acc;
-  }, { protein: 0, fat: 0, carbs: 0, calories: 0 });
-  
-  
+  const totalBJUAndCalories = ingredients.reduce(
+    (acc, ingredient) => {
+      if (ingredient) {
+        const quantity = ingredient.recipeIngredients[0].quantity;
+
+        const proteinCalories = Math.round(
+          ingredient.protein_content * quantity * 4
+        );
+        const fatCalories = Math.round(ingredient.fat_content * quantity * 9);
+        const carbCalories = Math.round(
+          ingredient.carbohydrate_content * quantity * 4
+        );
+
+        acc.calories += proteinCalories + fatCalories + carbCalories;
+        acc.protein += ingredient.protein_content * quantity;
+        acc.fat += ingredient.fat_content * quantity;
+        acc.carbs += ingredient.carbohydrate_content * quantity;
+      }
+      return acc;
+    },
+    { protein: 0, fat: 0, carbs: 0, calories: 0 }
+  );
 
   return (
     <div className={classes.container}>
       <div className={classes.user__info}>
         <h2>Рецепт добавил</h2>
-        {recipeCreateUser.role === "USER" ? (
-          <>
-            <h3>{recipeCreateUser.username}</h3>
-            <div className={classes.user__avatar}>
-              {recipeCreateUser.avatar ? (
-                <img src={recipeCreateUser.avatar} alt="аватар пользователя" />
-              ) : (
+        {recipeCreateUser ? ( // Проверяем, что recipeCreateUser существует
+          recipeCreateUser?.role === "USER" ? ( // Используем опциональную цепочку
+            <>
+              <h3>{recipeCreateUser?.username}</h3> {/* Используем опциональную цепочку */}
+              <div className={classes.user__avatar}>
+                {recipeCreateUser?.avatar ? ( // Используем опциональную цепочку
+                  <img src={recipeCreateUser.avatar} alt="аватар пользователя" />
+                ) : (
+                  <img
+                    src="/logo/chef-svgrepo-com (1).svg"
+                    alt="аватар пользователя"
+                  />
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <h3>Поварёнок</h3>
+              <div className={classes.user__avatar}>
                 <img
                   src="/logo/chef-svgrepo-com (1).svg"
                   alt="аватар пользователя"
                 />
-              )}
-            </div>
-          </>
+              </div>
+            </>
+          )
         ) : (
-          <>
-            <h3>Поварёнок</h3>
-            <div className={classes.user__avatar}>
-              <img
-                src="/logo/chef-svgrepo-com (1).svg"
-                alt="аватар пользователя"
-              />
-            </div>
-          </>
+           <Spinner animation="border" />
         )}
       </div>
       <div className={classes.recipe__info}>
         <h1>{currentRecipe.name}</h1>
         <p>{currentRecipe.description}</p>
+        <span> Время приготовления</span>
+        <span> - </span>
+        <span>{currentRecipe.time_to_prepare}</span>
+        <span> минут </span>
         <div className={classes.recipe__img}>
           <Image
             src={process.env.REACT_APP_API_URL + currentRecipe.recipe_img}
@@ -126,8 +137,10 @@ const RecipePage = observer(() => {
                   {ingredient.recipeIngredients?.[0]?.quantity || "N/A"}
                 </span>
                 <span>
-                  {ingredient.recipeIngredients?.[0]?.dimension_unit?.name ||
-                    "N/A"}
+                  {
+                    ingredient.recipeIngredients?.[0]?.dimension_unit?.name ||
+                    "N/A"
+                  }
                 </span>
               </li>
             ))}
@@ -151,7 +164,7 @@ const RecipePage = observer(() => {
             />
           ))}
         </div>
-        <CommentSection />
+        <CommentSection recipeId={id} />
       </div>
     </div>
   );

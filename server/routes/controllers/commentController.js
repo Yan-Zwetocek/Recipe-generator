@@ -1,4 +1,4 @@
-const {Comment} = require('../../models/models')
+const {Comment, User} = require('../../models/models')
 const ApiError = require('../../error/ApiError')
 class commentController {
     async createComment(req, res, next) {
@@ -13,18 +13,27 @@ class commentController {
     }
 
     async getCommentsByRecipeId(req, res, next) {
-
-        try { 
-            const { recipeId } = req.params; 
-            const comment = await Comment.findAll({ 
-             where: { recipeId }, 
-            }); 
-            return res.json(comment); 
-           } catch (e) { 
-            next(ApiError.badRequest(e.message)); 
-           } 
-        // Логика для получения всех комментариев
+      try {
+        const { recipeId } = req.params;
+    
+        const comments = await Comment.findAll({
+          where: { recipeId },
+          include: [
+            {
+              model: User,
+              attributes: ["id", "username", "avatar"], // Укажите, какие атрибуты пользователя вам нужны
+            },
+          ],
+          order: [['createdAt', 'DESC']] // Сортировка по дате создания, чтобы новые были сверху
+        });
+    
+        return res.json(comments);
+      } catch (e) {
+        next(ApiError.badRequest(e.message));
+      }
     }
+    
+    
 
     async deleteCommentsByRecipeId(req, res, next) {
         try {
