@@ -48,112 +48,122 @@ class recipeController {
 
   async createRecipe(req, res, next) {
     try {
-      const {
-        userId,
-        name,
-        description,
-        time_to_prepare,
-        categoryId, 
-        cuisineId
-      } = req.body;
+        const {
+            userId,
+            name,
+            description,
+            time_to_prepare,
+            categoryId,
+            cuisineId
+        } = req.body;
 
-      // Обработка массивов
-      let ingredientIds = [];
-      let quantities = [];
-      let dimensionUnitIds = [];  // Добавили массив для единиц измерения
-
-      if (Array.isArray(req.body.ingredientIds)) {
-        ingredientIds = req.body.ingredientIds.map(id => parseInt(id, 10));
-        quantities = req.body.quantities.map(qty => parseInt(qty, 10));
-        dimensionUnitIds = req.body.dimensionUnitIds.map(id => parseInt(id, 10)); // Обрабатываем dimensionUnitIds
-      } else if (req.body["ingredientIds[0]"]) {
-        let index = 0;
-        while (req.body[`ingredientIds[${index}]`] !== undefined) {
-          ingredientIds.push(parseInt(req.body[`ingredientIds[${index}]`], 10));
-          quantities.push(parseInt(req.body[`quantities[${index}]`], 10));
-          dimensionUnitIds.push(parseInt(req.body[`dimensionUnitIds[${index}]`], 10)); // Добавили обработку
-          index++;
+        // Проверка обязательных полей
+        if (!userId || !name || !description || !time_to_prepare || !categoryId || !cuisineId) {
+            return res.status(400).json({ error: "Не все обязательные поля заполнены!" });
         }
-      }
 
-      if (ingredientIds.length === 0) {
-        return res.status(400).json({ error: "No ingredientIds!!!" });
-      }
+        // Проверка наличия файла
+        if (!req.files || !req.files.recipe_img) {
+            return res.status(400).json({ error: "Не загружено изображение рецепта!" });
+        }
 
-      const { recipe_img } = req.files;
-      let fileName = uuid.v4() + ".jpg";
+        // Обработка массивов ингредиентов
+        let ingredientIds = [], quantities = [], dimensionUnitIds = [];
+        
+        if (Array.isArray(req.body.ingredientIds)) {
+            ingredientIds = req.body.ingredientIds.map(id => parseInt(id, 10));
+            quantities = req.body.quantities.map(qty => parseInt(qty, 10));
+            dimensionUnitIds = req.body.dimensionUnitIds.map(id => parseInt(id, 10));
+        } else if (req.body["ingredientIds[0]"]) {
+            let index = 0;
+            while (req.body[`ingredientIds[${index}]`] !== undefined) {
+                ingredientIds.push(parseInt(req.body[`ingredientIds[${index}]`], 10));
+                quantities.push(parseInt(req.body[`quantities[${index}]`], 10));
+                dimensionUnitIds.push(parseInt(req.body[`dimensionUnitIds[${index}]`], 10));
+                index++;
+            }
+        }
 
-      await recipe_img.mv(
-        path.resolve(__dirname, "../../", "static", "dishes", fileName)
-      );
+        // Проверка на наличие ингредиентов
+        if (ingredientIds.length === 0) {
+            return res.status(400).json({ error: "Не добавлены ингредиенты!" });
+        }
 
-      const recipe = await Recipe.create({
-        userId,
-        name,
-        description,
-        time_to_prepare,
-        recipe_img: fileName,
-        categoryId,
-        cuisineId,
-      });
+        // Проверка на соответствие размеров массивов
+        if (ingredientIds.length !== quantities.length || ingredientIds.length !== dimensionUnitIds.length) {
+            return res.status(400).json({ error: "Ошибка в данных ингредиентов!" });
+        }
 
-      // Добавляем ингредиенты с dimensionUnitId
-      const ingredientPromises = ingredientIds.map((ingredientId, index) => {
-        return Recipe_ingredients.create({
-          recipe_id: recipe.id,
-          ingredient_id: ingredientId,
-          quantity: quantities[index],
-          dimension_unit_id: dimensionUnitIds[index], 
+        // Обработка шагов рецепта
+        let steps = [];
+        let stepIndex = 0;
+        while (req.body[`steps[${stepIndex}][description]`] !== undefined) {
+            let step = {
+                description: req.body[`steps[${stepIndex}][description]`],
+                step_image: req.files && req.files[`steps[${stepIndex}][file]`] 
+                    ? req.files[`steps[${stepIndex}][file]`] 
+                    : null
+            };
+            steps.push(step);
+            stepIndex++;
+        }
+
+        // Проверка на наличие описания шагов
+        if (steps.length === 0) {
+            return res.status(400).json({ error: "Не добавлены шаги рецепта!" });
+        }
+
+        // Сохранение изображения рецепта
+        const { recipe_img } = req.files;
+        let fileName = uuid.v4() + ".jpg";
+        await recipe_img.mv(path.resolve(__dirname, "../../", "static", "dishes", fileName));
+
+        // Создание рецепта
+        const recipe = await Recipe.create({
+            userId,
+            name,
+            description,
+            time_to_prepare,
+            recipe_img: fileName,
+            categoryId,
+            cuisineId
         });
-      });
 
-              // Обработка шагов рецепта
-      let steps =[] ;
-      let stepIndex = 0;
+        // Добавляем ингредиенты
+        const ingredientPromises = ingredientIds.map((ingredientId, index) => {
+            return Recipe_ingredients.create({
+                recipe_id: recipe.id,
+                ingredient_id: ingredientId,
+                quantity: quantities[index],
+                dimension_unit_id: dimensionUnitIds[index]
+            });
+        });
 
-      while (req.body[`steps[${stepIndex}][description]`] !== undefined) {
-        let step = {
-          description: req.body[`steps[${stepIndex}][description]`],
-          step_image: req.files && req.files[`steps[${stepIndex}][file]`]
-            ? req.files[`steps[${stepIndex}][file]`]
-            : null,
-        };
-        steps.push(step);
-        stepIndex++;
-      }
-
-      if (steps.length > 0) {
+        // Добавляем шаги рецепта
         const stepsPromises = steps.map((step, index) => {
-          let stepFileName = null;
-
-          if (step.step_image) {
-            stepFileName = uuid.v4() + ".jpg";
-            step.step_image.mv(
-              path.resolve(__dirname, "../../", "static", "steps", stepFileName)
-            );
-          }
-
-          return RecipeSteps.create({
-            recipe_id: recipe.id,
-            step_number: index + 1,
-            description: step.description,
-            step_image: stepFileName,
-          });
+            let stepFileName = null;
+            if (step.step_image) {
+                stepFileName = uuid.v4() + ".jpg";
+                step.step_image.mv(path.resolve(__dirname, "../../", "static", "steps", stepFileName));
+            }
+            return RecipeSteps.create({
+                recipe_id: recipe.id,
+                step_number: index + 1,
+                description: step.description,
+                step_image: stepFileName
+            });
         });
 
+        await Promise.all(ingredientPromises);
         await Promise.all(stepsPromises);
-      }
 
-  
-
-      await Promise.all(ingredientPromises);
-
-      return res.json(recipe);
+        return res.json(recipe);
     } catch (e) {
-      console.error("Error in createRecipe:", e);
-      next(ApiError.badRequest(e.message));
+        console.error("Ошибка в createRecipe:", e);
+        next(ApiError.badRequest(e.message));
     }
-  }
+}
+
 
   async getRecipeById(req, res, next) {
     try {
@@ -171,13 +181,14 @@ class recipeController {
               "protein_content",
               "fat_content",
               "carbohydrate_content",
-              "calorie_content",
+              "calorie_content", 
+              "weight_in_grams",
             ],
             include: [
               {
                 model: Recipe_ingredients,
                 as: "recipeIngredients", // Указываем алиас
-                attributes: ["quantity"],
+                attributes: ["quantity",],
                 include: [
                   {
                     model: DimensionUnits,

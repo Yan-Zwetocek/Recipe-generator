@@ -4,13 +4,14 @@ const ApiError = require("../../error/ApiError");
 class ingredientController {
   async ingredientCreate(req, res, next) {
     try {
-      const { name,  calories, fat, carbs, protein } = req.body;
+      const { name,  calories, fat, carbs, protein, weight } = req.body;
       const ingredient = Ingredients.create({
         name, 
         calorie_content: calories,
         fat_content :fat, 
         carbohydrate_content : carbs, 
-        protein_content: protein
+        protein_content: protein,
+        weight_in_grams : weight
 
       });
       return res.json(ingredient);

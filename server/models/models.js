@@ -40,6 +40,7 @@ const Ingredients = sequelize.define("ingredients", {
   protein_content: { type: DataTypes.DECIMAL(10, 2) },
   fat_content: { type: DataTypes.DECIMAL(10, 2) },
   carbohydrate_content: { type: DataTypes.DECIMAL(10, 2) },
+  weight_in_grams: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
 });
 
 const DimensionUnits = sequelize.define("dimension_units", {
@@ -64,11 +65,20 @@ const Recipe_ingredients = sequelize.define("recipe_ingredients", {
   dimension_unit_id: {
     type: DataTypes.INTEGER,
     references: {
-      model: DimensionUnits, // Указываем, что ссылаемся на таблицу DimensionUnits
+      model: DimensionUnits,
       key: "id",
     },
     allowNull: false,
   },
+  ingredient_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Ingredients,
+      key: "id",
+    },
+    allowNull: false,
+  },
+  notes: { type: DataTypes.TEXT, allowNull: true }, // Новое поле
 });
 
 // --- Ассоциации ---

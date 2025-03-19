@@ -1,0 +1,10 @@
+const path = require('path');
+
+module.exports = {
+  'config': path.resolve( 'config/config.json'),  // или config.js, если вы используете JavaScript
+  '--models-path': path.resolve('models'),
+  '--migrations-path': path.resolve('migrations'),
+  '--models-path': path.resolve('models'),
+  '--migrations-path': path.resolve('migrations'),
+  
+};
