@@ -4,17 +4,14 @@ import CreateRecipePage from "./pages/CreateRecipePage/CreateRecipePage";
 import RecipePage from "./pages/RecipePage/RecipePage";
 import FavoritesPage from "./pages/FavoritesPage";
 import MainPages from "./pages/MainPages";
-import { ADMIN_ROUTE, CREATE_ROUTE, FAVORITES_ROUTE, LOGIN_ROUTE, MAIN_ROUTE, RECIPE_ROUTE, REGISTRATION_ROUTE } from "./utils/consts";
+import { ADMIN_ROUTE, CREATE_ROUTE, LOGIN_ROUTE, MAIN_ROUTE, RECIPE_ROUTE, REGISTRATION_ROUTE } from "./utils/consts";
 
 export const authRoutes = [
   {
     path: ADMIN_ROUTE,
     element: <AdminPage/>,
   },
-  {
-    path: FAVORITES_ROUTE,
-    element: <FavoritesPage/>,
-  },
+  
   {
     path: CREATE_ROUTE,
     element: <CreateRecipePage/>,

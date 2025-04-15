@@ -6,6 +6,9 @@ export default class RecipeStore {
     this._isLoading = false;
     this._error = null;
     this._selectedRecipe = null; // Для хранения выбранного рецепта
+    this._page = 1;
+    this._totalCount = 0;
+    this._limit = 1;
 
     makeAutoObservable(this);
   }
@@ -21,6 +24,15 @@ export default class RecipeStore {
   get error() {
     return this._error;
   }
+  get page() {
+    return this._page;
+  }
+  get totalCount() {
+    return this._totalCount;
+  }
+  get limit() {
+    return this._limit;
+  }
 
   get selectedRecipe() {
     return this._selectedRecipe;
@@ -32,4 +44,14 @@ export default class RecipeStore {
   setRecipes(recipes) {
     this._recipes = recipes;
   }
+  setPage(page) {
+    this._page = page;
+  }
+  setTotalCount(count) {
+    this._totalCount = count;
+  }
+  setLimit(limit) {
+    this._limit = limit;
+  }
+  
 }

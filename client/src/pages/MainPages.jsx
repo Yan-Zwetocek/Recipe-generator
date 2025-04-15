@@ -6,6 +6,7 @@ import { useContext } from "react";
 import { observer } from "mobx-react-lite";
 import RecipeService from "../Services/recipe-service";
 import { Spinner } from "react-bootstrap";
+import PaginationList from "../Components/PaginationItem/PaginationList";
 
 const MainPages = observer((props) => {
   const { user, recipe } = useContext(Context);
@@ -17,11 +18,14 @@ const MainPages = observer((props) => {
     const fetchData = async () => {
       try {
         // Получаем данные из RecipeService
-        const response = await RecipeService.getAll(); // Получаем response от API
+        const response = await RecipeService.getAll(null, null, recipe._page, recipe._limit); // Получаем response от API
         const recipesData = response.data.rows; // Получаем данные рецептов из response
+        const pageCount = response.data.count; // Получаем данные рецептов из response
         console.log(recipesData)
         // Устанавливаем данные в MobX store
         recipe.setRecipes(recipesData);
+        recipe.setTotalCount(pageCount);
+       
 
         // Теперь данные в MobX store, больше не нужно setRecipes в useState
 
@@ -35,7 +39,7 @@ const MainPages = observer((props) => {
 
     fetchData();
 
-  }, [recipe]); // Добавляем recipe в dependency array. Если recipe меняется, useEffect выполнится снова
+  }, [recipe, recipe._page, ]); // Добавляем recipe в dependency array. Если recipe меняется, useEffect выполнится снова
 
   if (isLoading) {
     return <Spinner animation="border" />;
@@ -50,6 +54,7 @@ const MainPages = observer((props) => {
       {recipes.map((recipe) => (
         <RecipeItem key={recipe.id} recipe={recipe} />
       ))}
+    <PaginationList/>
     </div>
   );
 });

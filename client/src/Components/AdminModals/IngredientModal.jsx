@@ -10,7 +10,7 @@ const IngredientModal = ({ active, setActive }) => {
   const protein = useInput("", { isEmpty: true });
   const fat = useInput("", { isEmpty: true });
   const carbs = useInput("", { isEmpty: true });
-  const dimensionUnits = useInput("", { isEmpty: true });
+  const weight = useInput("", { isEmpty: true });
 
   const addIngredient = () => {
     IngredientService.crate({
@@ -19,8 +19,9 @@ const IngredientModal = ({ active, setActive }) => {
       fat: fat.value,
       carbs: carbs.value,
       protein: protein.value,
+      weight: weight.value, 
     }).then();
-    console.log(ingredientName.value)
+    alert('Ингридиент успешно добавлен')
   };
   return (
     <Modal active={active} setActive={setActive}>
@@ -117,6 +118,19 @@ const IngredientModal = ({ active, setActive }) => {
             onBlur={carbs.onBlur}
             min="0"
           />
+          <label htmlFor="weight" className="form-label">
+            Масса ингредиента (г):
+          </label>
+          <input
+            type="number"
+            className={`form-control ${weight.isDirty && !weight.isValid ? 'error' : ''}`}
+            id="weight"
+            value={weight.value}
+            onChange={weight.onChange}
+            onBlur={weight.onBlur}
+            min="0"
+          />
+
           {carbs.isDirty && carbs.errorText && (
             <p className={classes.errorText}>{carbs.errorText}</p>
           )}

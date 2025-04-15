@@ -9,9 +9,9 @@ const CategoryModal = ({ active, setActive }) => {
   const category = useInput('', {isEmpty: true, minLengthError:3 }) 
   const addCategory = () =>{
       CategoryService.crate({name: category.value}).then(
+        alert('Категория успешно добавлена')
       
       );
-      console.log(category)
      }   
   return (
     <Modal active={active} setActive={setActive}>

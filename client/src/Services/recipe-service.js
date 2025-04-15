@@ -12,8 +12,8 @@ export default class RecipeService {
   
 
   // Получение всех рецептов
-  static async getAll() {
-    return $host.get("api/recipe");
+  static async getAll( cuisineId , categoryId, page, limit=5) {
+    return $host.get("api/recipe", {params:{cuisineId, categoryId, page, limit}});
   }
 
   // Получение рецепта по ID

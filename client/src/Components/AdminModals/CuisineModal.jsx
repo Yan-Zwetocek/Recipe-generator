@@ -9,7 +9,7 @@ const CuisineModal = ({ active, setActive }) => {
   const cuisine = useInput('', {isEmpty: true, minLengthError: 10 })
   const addCuisine = () =>{
     CuisinesService.crate({name: cuisine.value}).then(
-    
+      alert('Кухня  успешно добавлена')
     );
     console.log(cuisine)
    }   

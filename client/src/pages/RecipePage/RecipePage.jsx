@@ -27,6 +27,7 @@ const RecipePage = observer(() => {
       try {
         const recipeResponse = await RecipeService.getById(id);
         setCurrentRecipe(recipeResponse.data);
+        console.log(currentRecipe)
 
         const userResponse = await authService.getUserById(
           recipeResponse.data.userId
@@ -41,7 +42,7 @@ const RecipePage = observer(() => {
     };
 
     fetchData();
-  }, [id]);
+  }, []);
 
   if (isLoading) {
     return <Spinner animation="border" />;
@@ -56,30 +57,44 @@ const RecipePage = observer(() => {
   }
 
   const ingredients = currentRecipe.ingredients;
-
   const totalBJUAndCalories = ingredients.reduce(
     (acc, ingredient) => {
       if (ingredient) {
-        const quantity = ingredient.recipeIngredients[0].quantity;
-
-        const proteinCalories = Math.round(
-          ingredient.protein_content * quantity * 4
-        );
-        const fatCalories = Math.round(ingredient.fat_content * quantity * 9);
-        const carbCalories = Math.round(
-          ingredient.carbohydrate_content * quantity * 4
-        );
-
-        acc.calories += proteinCalories + fatCalories + carbCalories;
-        acc.protein += ingredient.protein_content * quantity;
-        acc.fat += ingredient.fat_content * quantity;
-        acc.carbs += ingredient.carbohydrate_content * quantity;
+        const quantity = ingredient.recipeIngredients[0].quantity; // Количество в рецепте
+        const mass = ingredient.weight_in_grams * quantity; // Масса ингредиента
+        console.log(mass);
+        
+        // Проверка наличия массы (если в базе масса на 100г)
+        if (!mass || mass <= 0) return acc;
+  
+        // Данные об ингредиенте из базы
+        const ingredientData = ingredient;
+  
+        // Расчет калорий и БЖУ
+        const calories = (ingredientData.calorie_content * mass) / 100;
+        const protein = (ingredientData.protein_content * mass) / 100;
+        const fat = (ingredientData.fat_content * mass) / 100;
+        const carbs = (ingredientData.carbohydrate_content * mass) / 100;
+  
+        // Суммирование в итоговую переменную
+        acc.calories += calories;
+        acc.protein += protein;
+        acc.fat += fat;
+        acc.carbs += carbs;
       }
       return acc;
     },
     { protein: 0, fat: 0, carbs: 0, calories: 0 }
   );
-
+  
+  // Округление итоговых значений
+  totalBJUAndCalories.calories = parseFloat(totalBJUAndCalories.calories.toFixed(2)); // Округление калорий до целого числа
+  totalBJUAndCalories.protein = parseFloat(totalBJUAndCalories.protein.toFixed(2)); // Округление белков до целого числа
+  totalBJUAndCalories.fat = parseFloat(totalBJUAndCalories.fat.toFixed(2)); // Округление жиров до целого числа
+  totalBJUAndCalories.carbs = parseFloat(totalBJUAndCalories.carbs.toFixed(2)); // Округление углеводов до двух знаков
+  
+  console.log(totalBJUAndCalories);
+  
   return (
     <div className={classes.container}>
       <div className={classes.user__info}>

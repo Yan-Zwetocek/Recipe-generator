@@ -1,0 +1,17 @@
+.customPageItem {
+  display: flex;
+  gap: 10px;
+  padding: 5px;
+}
+.active{
+  background-color: #fff;
+  color: #ff7b00;
+  line-height: 22px;
+  border: 2px #ff7b00 solid;
+}
+.button{
+  background-color: #ff7b00;
+  color: #fff;
+  line-height: 22px;
+  border: none;
+} 

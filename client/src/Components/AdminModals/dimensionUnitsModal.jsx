@@ -9,7 +9,7 @@ const DimensionUnitsModal = ({ active, setActive }) => {
   const dimensionUnit = useInput('', {isEmpty: true, })
   const addDimensionUnits= () =>{
     dimensionUnitsService.crate({name: dimensionUnit.value}).then(
-    
+      alert('Единица измерения успешно добавлена')
     );
     
    }   
