@@ -14,24 +14,72 @@ import {
   MAIN_ROUTE,
   ADMIN_ROUTE,
 } from "../../utils/consts";
+import RecipeService from "../../Services/recipe-service";
 
 const Header = observer(() => {
   const [roleChecked, setRoleChecked] = useState(false);
   const [modelActive, setModalActive] = useState(false);
-  const { user } = useContext(Context);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [recipeList, setRecipeList] = useState([]);
+  const { user, recipe } = useContext(Context);
   const navigate = useNavigate(); // Добавили useNavigate
-useEffect(() => {
-  if (user._isAuth) {
-    setModalActive(false);
-    if (user.user.data?.role === "ADMIN") {
-      setRoleChecked(true);
-    } else {
-      setRoleChecked(false);
-    }
 
+  useEffect(() => {
+    const fetchData = async ()=>{
+      try{
+        const response = await RecipeService.getAll(); 
+        setRecipeList(response.data.rows)
+      
+
+      }
+      catch(e){
+       alert(e)
+      }
+    }
+    fetchData()
+  }, []);
+
+  
+  useEffect(() => {
+    if (user._isAuth) {
+      setModalActive(false);
+      if (user.user.data?.role === "ADMIN") {
+        setRoleChecked(true);
+      } else {
+        setRoleChecked(false);
+      }
+    }
+  }, [user._isAuth]);
+
+
+  useEffect(() => {
+    const debounce = setTimeout(async () => {
+      const filteredRecipe = await searchRecipe(searchTerm); // ⏳ ждём результат
+      if(filteredRecipe==! undefined){
+        recipe.setRecipes(filteredRecipe);
+
+      }
+    }, 300);
+    return () => clearTimeout(debounce);
+  }, [searchTerm]);
+
+  const searchRecipe = async (searchText) => {
+    if (!searchText) {
+       recipe.setRecipes(recipe._constantRecipes);
+       recipe.setTotalCount(recipe._constantPage);
+       
+      return;
+    } else {
+      const foundRecipe = recipeList.filter(({ name }) => 
+        name.toLowerCase().includes(searchText.toLowerCase())
+      );
+      recipe.setRecipes(foundRecipe);
+      recipe.setTotalCount(0);
+      return foundRecipe;
     
-  }
-}, [user._isAuth]);
+      
+    }
+  };
   return (
     <Navbar collapseOnSelect expand="lg" className={classes.heder}>
       <Navbar.Brand>
@@ -45,7 +93,11 @@ useEffect(() => {
 
       <Navbar.Collapse id="response__navbar-nav">
         <Nav className="mr-auto">
-          <Input placeholder="Поиск блюд по названию" type="text" />
+          <Input
+            placeholder="Поиск блюд по названию"
+            type="text"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </Nav>
         <Nav className="ms-auto">
           <br />

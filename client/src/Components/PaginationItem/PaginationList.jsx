@@ -7,7 +7,7 @@ import ColorButton from '../Ui/ColorButton/ColorButton';
 const PaginationList = (props) => {
   const { recipe } = useContext(Context);
   const totalCount = Math.ceil(recipe.totalCount / recipe.limit);
-  console.log(recipe.totalCount)
+  console.log(totalCount)
   const pages = [];
   for (let i = 0; i < totalCount; i++) {
     pages.push(i + 1);

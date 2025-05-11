@@ -9,6 +9,9 @@ export default class RecipeStore {
     this._page = 1;
     this._totalCount = 0;
     this._limit = 1;
+    this._constantPage=0;
+    this._constantRecipes=[];
+
 
     makeAutoObservable(this);
   }
@@ -33,6 +36,12 @@ export default class RecipeStore {
   get limit() {
     return this._limit;
   }
+  get constantPage() {
+    return this._constantPage;
+  }
+  get constantRecipes() {
+    return this._constantRecipes;
+  }
 
   get selectedRecipe() {
     return this._selectedRecipe;
@@ -52,6 +61,13 @@ export default class RecipeStore {
   }
   setLimit(limit) {
     this._limit = limit;
+  }
+  setConstantPage(constantPage) {
+    this._constantPage = constantPage;
+  }
+  
+  setConstantRecipes(constantRecipes) {
+    this._constantRecipes = constantRecipes;
   }
   
 }

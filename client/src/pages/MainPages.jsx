@@ -25,6 +25,8 @@ const MainPages = observer((props) => {
         // Устанавливаем данные в MobX store
         recipe.setRecipes(recipesData);
         recipe.setTotalCount(pageCount);
+        recipe.setConstantPage(pageCount);
+        recipe.setConstantRecipes(recipesData);
        
 
         // Теперь данные в MobX store, больше не нужно setRecipes в useState

@@ -7,45 +7,36 @@ class recipeController {
   async getAllRecipe(req, res, next) {
     try {
       let { cuisineId, categoryId, limit = 9, page = 1 } = req.query;
-
+  
+      limit = parseInt(limit, 10) || 9;
+      page = parseInt(page, 10) || 1;
       let offset = (page - 1) * limit;
-      limit = parseInt(limit, 10) || 9; 
-      page = parseInt(page, 10) || 1; 
-
-      let recipes;
-
-      if (categoryId && cuisineId) {
-        recipes = await Recipe.findAndCountAll({
-          where: { categoryId, cuisineId },
-          limit,
-          offset,
-        });
-      } else if (!categoryId && cuisineId) {
-        recipes = await Recipe.findAndCountAll({
-          where: { cuisineId },
-          limit,
-          offset,
-        });
-      } else if (categoryId && !cuisineId) {
-        recipes = await Recipe.findAndCountAll({
-          where: { categoryId },
-          limit,
-          offset,
-        });
-      } else {
-        recipes = await Recipe.findAndCountAll({
-          limit,
-          offset,
-        });
-      }
-
+  
+      let whereCondition = {};
+      if (cuisineId) whereCondition.cuisineId = cuisineId;
+      if (categoryId) whereCondition.categoryId = categoryId;
+  
+      const recipes = await Recipe.findAndCountAll({
+        where: whereCondition,
+        limit,
+        offset,
+        include: [
+          {
+            model: Ingredients,
+            through: { attributes: ['quantity', 'dimension_unit_id', 'notes'] }, // что взять из таблицы связи
+            as: 'ingredients', // если у тебя есть алиас, его надо прописать
+          },
+         
+        ],
+      });
+  
       return res.json(recipes);
     } catch (e) {
       console.error("Error in getAllRecipe:", e);
       next(ApiError.badRequest(e.message));
     }
   }
-
+  
   async createRecipe(req, res, next) {
     try {
         const {
