@@ -220,11 +220,13 @@ const CreateRecipePage = () => {
           options={cuisine}
           value={selectedCuisineId}
           onChange={setSelectedCuisineId}
+          key={selectedCuisineId}
         />
         <SelectList
           options={category}
           value={selectedCategoryId}
           onChange={setSelectedCategoryId}
+          key={selectedCategoryId}
         />
 
 <div className={classes.ingredient__form }>

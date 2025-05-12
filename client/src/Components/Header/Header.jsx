@@ -65,7 +65,6 @@ const Header = observer(() => {
 
   const searchRecipe = async (searchText) => {
     if (!searchText) {
-       recipe.setRecipes(recipe._constantRecipes);
        recipe.setTotalCount(recipe._constantPage);
        
       return;

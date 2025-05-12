@@ -16,7 +16,8 @@ const SearchRecipeForm = (props) => {
   const [selectedCuisineId, setSelectedCuisineId] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const desiredIngredients = useInput("", { minLengthError: 3 });
+  const searchIngredients = useInput("", { minLengthError: 3 });
+  const excludeIngredients = useInput("", { minLengthError: 3 });
 
   useEffect(() => {
     CuisinesService.getAll().then((response) => {
@@ -32,16 +33,85 @@ const SearchRecipeForm = (props) => {
   if (isLoading) {
     return <Spinner animation="border" />;
   }
+ const searchByIngredients = (searchIngredients, excludeIngredients) => {
+  // Проверка на обязательные ингредиенты
+  if (!searchIngredients) {
+    console.warn("Не указаны обязательные ингредиенты для поиска.");
+    recipe.setRecipes([]);
+    return;
+  }
+
+  console.log("Поиск по ингредиентам:", searchIngredients);
+  console.log("Исключить ингредиенты:", excludeIngredients);
+
+  const allRecipes = recipe._constantRecipes;
+  if (!Array.isArray(allRecipes)) {
+    console.error("Некорректный формат данных рецептов.");
+    return;
+  }
+
+  // Обработка обязательных ингредиентов
+  const includeIngredients = searchIngredients
+    .split(",")
+    .map((ingr) => ingr.trim().toLowerCase())
+    .filter((ingr) => ingr.length > 0);
+
+  // Обработка исключаемых ингредиентов
+  const excludeIngredientsArray = excludeIngredients
+    ? excludeIngredients
+        .split(",")
+        .map((ingr) => ingr.trim().toLowerCase())
+        .filter((ingr) => ingr.length > 0)
+    : [];
+
+  if (includeIngredients.length === 0) {
+    console.warn("Не найдено валидных обязательных ингредиентов после обработки.");
+    recipe.setRecipes([]);
+    return;
+  }
+
+  const matchingRecipes = allRecipes.filter((r) => {
+    if (!Array.isArray(r.ingredients)) {
+      console.warn(`Рецепт "${r.name || 'Без названия'}" не имеет корректных ингредиентов.`);
+      return false;
+    }
+
+    const recipeIngredientNames = r.ingredients
+      .map((ingredient) => ingredient.name?.toLowerCase())
+      .filter(Boolean);
+
+    // Проверка на присутствие всех обязательных ингредиентов
+    const hasAllIncluded = includeIngredients.every((searchIng) =>
+      recipeIngredientNames.some((ingredientName) =>
+        ingredientName.includes(searchIng)
+      )
+    );
+
+    // Проверка на отсутствие всех исключенных ингредиентов
+    const hasNoExcluded = excludeIngredientsArray.every((excludeIng) =>
+      recipeIngredientNames.every((ingredientName) =>
+        !ingredientName.includes(excludeIng)
+      )
+    );
+
+    return hasAllIncluded && hasNoExcluded;
+  });
+
+  console.log(`Найдено рецептов: ${matchingRecipes.length}`, matchingRecipes);
+
+  recipe.setRecipes(matchingRecipes);
+};
+
    const fetchData = async () => {
        try {
          // Получаем данные из RecipeService
          const response = await RecipeService.getAll(selectedCuisineId,selectedCategoryId, recipe.page, recipe.limit ); // Получаем response от API
          const recipesData = response.data.rows; // Получаем данные рецептов из response
          const totalCount = response.data.count; // Получаем данные рецептов из response
+         searchByIngredients(searchIngredients.value, excludeIngredients.value)
          console.log(recipesData)
-         // Устанавливаем данные в MobX store
-         recipe.setRecipes(recipesData);
-         recipe.setTotalCount(totalCount);
+         recipe.setTotalCount(0);
+
  
          
  
@@ -52,6 +122,9 @@ const SearchRecipeForm = (props) => {
          setIsLoading(false); // Заканчиваем загрузку
        }
      };;
+      const searchReset= () =>{
+       window.location.reload();
+      } 
   return (
     <div className={classes.container}>
       <h1>Поиск блюд по ингредиентам</h1>
@@ -60,22 +133,22 @@ const SearchRecipeForm = (props) => {
           <label htmlFor="ingredient" className="form-label">
             Желаемые ингредиенты
           </label>
-          {desiredIngredients.isDirty && desiredIngredients.isEmpty && (
+          {searchByIngredients.isDirty && searchIngredients.isEmpty && (
             <div className={classes.errorText}>
-              {desiredIngredients.errorText}
+              {searchIngredients.errorText}
             </div>
           )}
           <input
             type="text"
             className={`form-control ${
-              desiredIngredients.isDirty && desiredIngredients.isEmpty
+              searchIngredients.isDirty && searchIngredients.isEmpty
                 ? "is-invalid"
                 : ""
             }`}
-            id="ingredient"
-            placeholder="Введите ингредиент"
-            onBlur={(e) => desiredIngredients.onBlur(e)}
-            onChange={(e) => desiredIngredients.onChange(e)}
+            id="searchIngredients"
+            placeholder="Введите ингредиент через запятую"
+            onBlur={(e) => searchIngredients.onBlur(e)}
+            onChange={(e) => searchIngredients.onChange(e)}
             required
           />
         </div>
@@ -87,8 +160,10 @@ const SearchRecipeForm = (props) => {
           <input
             type="text"
             className="form-control"
-            id="ingredient"
-            placeholder="Введите ингредиент"
+            id="excludeIngredients"
+            placeholder="Введите ингредиент через запятую "
+             onBlur={(e) => excludeIngredients.onBlur(e)}
+            onChange={(e) => excludeIngredients.onChange(e)}
             required
           />
         </div>
@@ -96,7 +171,7 @@ const SearchRecipeForm = (props) => {
           <label htmlFor="cuisine" className="form-label">
             Калории
           </label>
-          <SelectList id="category" options={categoryNames} value={selectedCategoryId} onChange={setSelectedCategoryId} />
+          <SelectList id="category" key={categoryNames} options={categoryNames} value={selectedCategoryId} onChange={setSelectedCategoryId} />
         </div>
         <div className="col-md-4">
           <label htmlFor="category" className="form-label">
@@ -108,10 +183,12 @@ const SearchRecipeForm = (props) => {
             value={selectedCuisineId}
             onChange={setSelectedCuisineId}
             options={cuisineNames}
+            key={cuisineNames}
           />
         </div>
         <div className="col-12">
           <LightButton onClick={()=>fetchData(selectedCuisineId, selectedCategoryId )}> Найти рецепты</LightButton>
+          <LightButton onClick={()=>searchReset()}> Сбросить поиск</LightButton>
         </div>
       </form>
     </div>

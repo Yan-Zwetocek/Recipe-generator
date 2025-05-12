@@ -20,6 +20,7 @@ class recipeController {
         where: whereCondition,
         limit,
         offset,
+        distinct: true, 
         include: [
           {
             model: Ingredients,
